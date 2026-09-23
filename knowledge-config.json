@@ -1,0 +1,35 @@
+{
+  "$comment": "Single source of configuration for the graph-first knowledge pipeline (raw + docs/specs -> Graphify -> Obsidian -> OKF). The .opencode/commands wiki commands (/generate-llm-wiki, /publish-llm-wiki), the second-brain-keeper agent and scripts/source_watch.py all read from here. To port this system to another repository, change these values only. There is no CI in this project — the OKF gate is validate.sh, run before /publish-llm-wiki.",
+
+  "source_roots": ["raw", "docs/specs"],
+  "immutable_roots": ["raw"],
+
+  "graph_out": "graphify-out",
+  "graph_json": "graphify-out/graph.json",
+  "stage_dir": "graphify-out/stage",
+  "source_manifest": "graphify-out/.source-manifest.json",
+  "pipeline_state": "graphify-out/.pipeline_state.json",
+
+  "bundle_root": "graphify-out/wiki",
+
+  "okf_version": "0.1",
+  "reserved_files": ["index.md", "log.md"],
+  "recommended_frontmatter": ["type", "title", "description", "tags", "timestamp", "resource"],
+  "recommended_types": [
+    "Component", "Module", "Service", "API Endpoint", "Data Model",
+    "Process", "Integration", "Technology", "Architecture",
+    "Decision", "Reference", "Playbook", "Community Overview"
+  ],
+
+  "extraction_mode": "deep",
+  "extraction_backend": "deepseek",
+  "$comment_extraction_backend": "RESOLVED on first run (graphify 0.9.53): backend 'deepseek' is the native OpenAI-compatible DeepSeek backend — env DEEPSEEK_API_KEY (set), base https://api.deepseek.com, default model deepseek-v4-flash (matches the project model matrix). Resolved live with `opencode` + `graphify` installed, as the OTQ required.",
+  "okf_enrichment": true,
+  "deepen": true,
+  "deepen_scope": "all",
+
+  "okf_validate_script": ".opencode/skills/okf-open-knowledge-format/scripts/validate.sh",
+  "semantic_index": "index/index.json",
+
+  "source_ignored_files": [".gitkeep", ".gitignore", ".DS_Store", "Thumbs.db"]
+}

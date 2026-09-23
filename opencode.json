@@ -1,0 +1,27 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "deepseek": {
+      "options": {
+        "baseURL": "https://api.deepseek.com/v1"
+      }
+    }
+  },
+  "model": "deepseek/deepseek-v4-flash",
+  "permission": {
+    "edit": {
+      "raw/**": "deny",
+      "*": "allow"
+    },
+    "bash": {
+      "git push": "ask",
+      "rm -rf *": "deny",
+      "*": "allow"
+    },
+    "webfetch": "allow"
+  },
+  "instructions": [
+    "AGENTS.md",
+    "docs/specs/constitution.md"
+  ]
+}
