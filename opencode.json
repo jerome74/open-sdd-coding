@@ -21,7 +21,6 @@
     "webfetch": "allow"
   },
   "instructions": [
-    "AGENTS.md",
-    "docs/specs/constitution.md"
+    "AGENTS.md"
   ]
 }
