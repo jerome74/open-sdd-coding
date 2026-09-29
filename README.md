@@ -17,10 +17,12 @@ docs/input/*.md            (requisito funzionale)
   → deliverable (codice, doc, config, diagrammi, …)
 ```
 
-La costituzione SDD del progetto è [`docs/specs/constitution.md`](docs/specs/constitution.md):
-mission, principi, tech stack e — soprattutto — la `## Roadmap`, unica fonte di verità sullo stato
-di avanzamento. Le regole di processo (Conductor, discovery per ruolo, immutabilità, lingua)
-stanno in [`AGENTS.md`](AGENTS.md), caricato automaticamente da OpenCode.
+La costituzione SDD del progetto — **generata da `/init-new-project`** — vive in
+`docs/specs/constitution.md`: quando presente raccoglie mission, principi, tech stack e —
+soprattutto — la `## Roadmap`, unica fonte di verità sullo stato di avanzamento. Le regole di
+processo (Conductor, discovery per ruolo, immutabilità, lingua) stanno in [`AGENTS.md`](AGENTS.md),
+caricato automaticamente da OpenCode. Finché la Costituzione non è stata generata, la roadmap **non è
+inizializzata**.
 
 ## 2. Prerequisiti
 
