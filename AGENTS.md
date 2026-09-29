@@ -6,6 +6,45 @@ SDD**) — this file links to it rather than duplicating it.
 
 ---
 
+## 0. Costituzione SDD — fonte unica di missione, principi, tech stack e roadmap
+
+La **Costituzione SDD** del progetto è `docs/specs/constitution.md`. È la fonte autorevole per:
+
+- **Mission** e **principi non negoziabili**;
+- **Tech Stack** (linguaggio, embedding, grafo, pattern architetturali e vincoli obbligatori);
+- **`## Roadmap`** — la checklist delle funzionalità, unica autorità su stato e ordine di
+  esecuzione (cfr. §4).
+
+Questo file contiene le **regole di processo** dell'SDD e **non duplica** il contenuto della
+Costituzione: in caso di dubbio su *cosa* costruire, vale la Costituzione.
+
+### 0.1 General agent guidelines
+
+- **Think before coding** — leggi le spec e la Costituzione pertinenti prima di agire; se un
+  requisito non è documentato, fermati e segnalalo, non inventare.
+- **Simplicity first** — YAGNI: nessun componente, entità o dipendenza speculativa.
+- **Surgical changes** — modifica solo ciò che il compito richiede; preserva tutto il resto.
+- **Goal-driven execution** — ogni lavoro è tracciato da una voce di `## Roadmap` o da una
+  Micro-Spec; una voce si chiude solo a ciclo completo (§4).
+- **Consult before answering** — prima di rispondere o generare contenuti sul progetto, consulta
+  la knowledge base (ricerca semantica + grafo, `scripts/cag_context.py`) e **cita le note usate**;
+  senza risultati pertinenti dichiara l'assenza e **non inventa**, e non legge `raw/` (FR-011, BR-1).
+
+### 0.2 Convenzioni di progetto (derivate dal Tech Stack)
+
+- **Linguaggio:** Python 3 per gli script locali (`build_index.py`, `query_index.py`,
+  `source_watch.py`); type hints e gestione esplicita degli errori.
+- **Configurazione:** percorsi e parametri da `knowledge-config.json` — mai hard-coded.
+- **Embedding:** `intfloat/multilingual-e5-small` in-process e locale (nessuna chiave API per
+  indicizzare).
+- **Grafo:** `graphify` → `graphify-out/graph.json` (dipendenza esterna deliberata, cfr. §1 e
+  Costituzione, Principio 8).
+- **Assistente:** DeepSeek cloud (`opencode.json`).
+- **Pubblicazione:** Git, ramo `<name>_llm_wiki` via `/publish-llm-wiki`.
+- Lingua di spec e Costituzione: **italiano** (§6).
+
+---
+
 ## 1. What this project is
 
 This is **not** an application codebase. There is no `package.json`, no build, no test suite. The
@@ -147,7 +186,7 @@ by the role/description, so a renamed or relocated asset still classifies correc
 | Bug / small change → Micro-Spec patch spec + one roadmap item | `micro-spec.md` |
 | *(auxiliary, not SDD pipeline)* Restate requirements, assess risks, draft an implementation plan from an `engineering/prompt/` file — waits for confirmation before writing `engineering/plan/<name>.md`; drafting delegated to `@planner` | `plan.md` |
 | *(auxiliary, not SDD pipeline)* Structure a free-form ask into the `tech-plan/the_prompt_engineering.md` framework, grounding every field only in what the user said | `prompt-engineering.md` |
-| Knowledge pipeline (graph-first): change-detect → Graphify graph → Obsidian vault → OKF bundle → lexical index. Phase 0 on the primary agent, phases 1–5 delegated | `generate-llm-wiki.md` |
+| Knowledge pipeline (graph-first): change-detect → Graphify graph → Obsidian vault → OKF bundle → semantic index. Phase 0 on the primary agent, phases 1–5 delegated | `generate-llm-wiki.md` |
 | Publish the knowledge bundle (`graphify-out/` + `index/`) on a dedicated branch | `publish-llm-wiki.md` |
 
 ### Subagents (`.opencode/agents/`)
@@ -170,7 +209,7 @@ by the role/description, so a renamed or relocated asset still classifies correc
 | Fill the Prompt Engineering template (`tech-plan/the_prompt_engineering.md`) from a raw ask; grounding rule + escalation ladder; never silently infer missing parts | `prompt-engineering/SKILL.md` |
 | The OKF v0.1 spec — frontmatter semantics, reserved filenames (`index.md`/`log.md`), the three conformance rules; bundled `scripts/validate.sh` fallback gate | `okf-open-knowledge-format/SKILL.md` |
 | The wiki → OKF conversion workflow applied to `graphify-out/wiki/` | `wiki-to-okf/SKILL.md` |
-| Build/query `index/index.json`, a lexical chunk index over `graphify-out/wiki/` — no embedding model, no API; `scripts/build_index.py` + `scripts/query_index.py` | `wiki-semantic-search/SKILL.md` |
+| Build/query `index/index.json`, the semantic (vector) chunk index over `graphify-out/wiki/` — local embedding model, no API key; `scripts/build_index.py` + `scripts/query_index.py` | `wiki-semantic-search/SKILL.md` |
 
 ### Config
 
@@ -183,12 +222,12 @@ by the role/description, so a renamed or relocated asset still classifies correc
 
 | Role | Model |
 |---|---|
-| **All roles** — default, primary agent, commands, every subagent | `deepseek/deepseek-v4-flash` |
+| **All roles** — default, primary agent, commands, every subagent | `deepseek/deepseek-flash` |
 
 Set once as `model` in `opencode.json`; every agent file and the `spec-brainstorm` command
 frontmatter pin the same id.
 
-> **Fallback:** `deepseek-v4-flash` is the id asserted by the operator. If it is not available on
+> **Fallback:** `deepseek-flash` is the id asserted by the operator. If it is not available on
 > the account, replace it with a DeepSeek model listed by `/models` — the default in
 > `opencode.json` plus one frontmatter change per agent / the `spec-brainstorm` command.
 
@@ -204,3 +243,33 @@ in this project.
 
 `/init-new-project` may (re)write parts of this file from the specs. If OpenCode loads `AGENTS.md`
 only once per session, re-open the session after `/init-new-project` for its edits to take effect.
+
+
+# RTK Token Optimization Rules
+
+## Core Principle
+
+When executing shell commands, you **MUST** prefix all eligible commands with `rtk`. RTK compresses command output and reduces token consumption by 60-90% [citation:14].
+
+## Required Command Mapping
+
+| Original Command | RTK Command |
+|-----------------|-------------|
+| `ls`, `tree` | `rtk ls` |
+| `cat`, `head`, `tail` | `rtk read` |
+| `grep`, `rg` | `rtk grep` |
+| `find` | `rtk find` |
+| `git status` | `rtk git status` |
+| `git log` | `rtk git log` |
+| `git diff` | `rtk git diff` |
+| `cargo build` | `rtk cargo build` |
+| `cargo test` | `rtk test cargo test` |
+| `npm test` | `rtk test npm test` |
+| `npm run build` | `rtk err npm run build` |
+
+## Exceptions
+
+Do NOT use RTK in the following cases:
+- Commands that already pipe output (`grep x | head`) [citation:1]
+- Commands that produce no output (`cd`, `mkdir`, `rm`)
+- When `rtk` binary is not installed (check with `rtk --version`)

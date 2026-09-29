@@ -1,7 +1,7 @@
 ---
 description: "Transform a functional analysis into implementation-ready technical specifications (architecture, domain/data models) for Spec-Driven Development"
 argument-hint: "Path to the functional proposal / functional analysis file to analyze"
-model: deepseek/deepseek-v4-flash
+model: deepseek/deepseek-flash
 ---
 
 # Technical Specification Discovery & Design — Caveman Mode
@@ -12,7 +12,7 @@ This command runs as the **primary agent** and authors the specs itself. The `sp
 subagent stays available for standalone spec authoring **outside** this flow — this command does
 not delegate to it.
 
-> **Model note.** Frontmatter pins `deepseek/deepseek-v4-flash` (the project's single model). If
+> **Model note.** Frontmatter pins `deepseek/deepseek-flash` (the project's single model). If
 > that model is not available on the account, change the frontmatter `model` to a DeepSeek model
 > listed by `/models` (see `AGENTS.md` §7).
 

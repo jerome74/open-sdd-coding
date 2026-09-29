@@ -82,13 +82,13 @@ fuori da un comando e le instrada qui.
 
 | Ruolo | Modello |
 |---|---|
-| **Tutti i ruoli** — default, agente primario, comandi, ogni subagent | `deepseek/deepseek-v4-flash` |
+| **Tutti i ruoli** — default, agente primario, comandi, ogni subagent | `deepseek/deepseek-flash` |
 
 Modello unico, impostato in `opencode.json` (`"model"`) e ripetuto nel frontmatter di ogni file
 in `.opencode/agents/` e del comando `spec-brainstorm`. `/models` elenca i modelli DeepSeek
 disponibili sul tuo account.
 
-**Fallback.** `deepseek-v4-flash` è l'ID indicato dall'operatore. Se non è disponibile sul tuo
+**Fallback.** `deepseek-flash` è l'ID indicato dall'operatore. Se non è disponibile sul tuo
 account, sostituiscilo con un modello DeepSeek elencato da `/models`: il default in
 `opencode.json` più una modifica di frontmatter per ogni agente e per `spec-brainstorm`.
 
@@ -166,7 +166,7 @@ considerato completo.
 | ID | Controllo | Metodo | Pass se |
 |---|---|---|---|
 | S-01 | Il progetto avvia | `DEEPSEEK_API_KEY` esportata, `opencode` nella root | avvio senza errori di config |
-| S-02 | DeepSeek risolto | `/models` | l'elenco include `deepseek/deepseek-v4-flash` (o il modello sostitutivo scelto) |
+| S-02 | DeepSeek risolto | `/models` | l'elenco include `deepseek/deepseek-flash` (o il modello sostitutivo scelto) |
 | S-03 | I 5 comandi visibili | elenco comandi nella TUI | compaiono `gather-requirements`, `spec-brainstorm`, `init-new-project`, `SDD-implement`, `micro-spec` |
 | S-04 | Le skill visibili | descrizione del tool `skill` | include `sdd-guardrail` |
 | S-05 (opzionale, consuma quota) | Flusso minimo | `/gather-requirements` con un'idea di test → `/spec-brainstorm` | vengono creati file sotto `docs/input/` e `docs/specs/` |
@@ -182,7 +182,7 @@ documentato il fallback.
 
 | # | Domanda aperta | Default adottato | Fallback |
 |---|---|---|---|
-| 1 | `deepseek/deepseek-v4-flash` è un ID modello valido sul tuo account? | modello unico per tutti i ruoli, asserito dall'operatore | confermare con `/models`; se assente, sostituire con un modello DeepSeek elencato (default in `opencode.json` + frontmatter di ogni agente e di `spec-brainstorm`) |
+| 1 | `deepseek/deepseek-flash` è un ID modello valido sul tuo account? | modello unico per tutti i ruoli, asserito dall'operatore | confermare con `/models`; se assente, sostituire con un modello DeepSeek elencato (default in `opencode.json` + frontmatter di ogni agente e di `spec-brainstorm`) |
 | 2 | `permission.edit` supporta glob per-path (`raw/**` deny)? | forma `{ "raw/**": "deny", "*": "allow" }` in `opencode.json` | qualunque forma equivalente che renda `raw/**` non scrivibile |
 | 3 | `micro-spec-author` può limitare `edit` a `docs/specs/patch-*.spec.md` + `constitution.md`? | vincolo dichiarato nel frontmatter | vincolo solo testuale nel corpo dell'agente (come nel repo di riferimento) |
 | 4 | Il runtime espone il frontmatter degli asset a `/SDD-implement` Fase 0? | scan diretto di `.opencode/**` | sezione **Capability Registry** in `AGENTS.md` (per ruolo) |

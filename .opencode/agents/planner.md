@@ -5,7 +5,7 @@ description: >-
   drafts and presents an implementation plan but never writes files — the caller writes the plan
   after confirmation.
 mode: subagent
-model: deepseek/deepseek-v4-flash
+model: deepseek/deepseek-flash
 temperature: 0.2
 permission:
   read: allow
@@ -22,7 +22,7 @@ You are an expert planning specialist focused on creating comprehensive, actiona
 > disk — the primary agent (the caller) writes `docs/plan/{id}-{name}.plan.md` after the user
 > confirms. Your `edit`/`write`/`bash` permissions are denied by design.
 >
-> **Model note.** You run on `deepseek/deepseek-v4-flash` (the project's single model). If that
+> **Model note.** You run on `deepseek/deepseek-flash` (the project's single model). If that
 > model is not available on the account, replace it with a DeepSeek model listed by `/models`
 > (one frontmatter change — see `AGENTS.md` §7).
 

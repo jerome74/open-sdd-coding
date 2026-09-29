@@ -7,7 +7,7 @@ description: >-
   spec only; execution belongs to the SDD implementation workflow. Do NOT use to author full
   feature specifications.
 mode: subagent
-model: deepseek/deepseek-v4-flash
+model: deepseek/deepseek-flash
 temperature: 0.2
 permission:
   read: allow

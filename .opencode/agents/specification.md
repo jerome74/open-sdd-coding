@@ -4,7 +4,7 @@ description: >-
   unambiguous, machine-readable, self-contained. Invoke when a standalone spec document is needed
   outside the /spec-brainstorm discovery flow.
 mode: subagent
-model: deepseek/deepseek-v4-flash
+model: deepseek/deepseek-flash
 temperature: 0.2
 permission:
   read: allow

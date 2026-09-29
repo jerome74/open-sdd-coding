@@ -23,13 +23,46 @@
 
   "extraction_mode": "deep",
   "extraction_backend": "deepseek",
-  "$comment_extraction_backend": "RESOLVED on first run (graphify 0.9.53): backend 'deepseek' is the native OpenAI-compatible DeepSeek backend — env DEEPSEEK_API_KEY (set), base https://api.deepseek.com, default model deepseek-v4-flash (matches the project model matrix). Resolved live with `opencode` + `graphify` installed, as the OTQ required.",
+  "$comment_extraction_backend": "RESOLVED on first run (graphify 0.9.53): backend 'deepseek' is the native OpenAI-compatible DeepSeek backend — env DEEPSEEK_API_KEY (set), base https://api.deepseek.com, default model deepseek-flash (matches the project model matrix). Resolved live with `opencode` + `graphify` installed, as the OTQ required.",
   "okf_enrichment": true,
   "deepen": true,
   "deepen_scope": "all",
 
   "okf_validate_script": ".opencode/skills/okf-open-knowledge-format/scripts/validate.sh",
   "semantic_index": "index/index.json",
+
+  "embedding": {
+    "service": "local",
+    "model": "intfloat/multilingual-e5-small",
+    "dimension": 384
+  },
+  "index": {
+    "chunk_words": 250,
+    "chunk_overlap": 0,
+    "part_threshold_mb": 50
+  },
+  "search": {
+    "top_k": 5,
+    "min_score": 0.8,
+    "metric": "cosine"
+  },
+  "retrieval": {
+    "strategy": "standard",
+    "neighbor_width": 1,
+    "max_extended_blocks": 15
+  },
+  "cag": {
+    "graph_threshold_kb": 100
+  },
+  "search_log": {
+    "enabled": true,
+    "path": "logs/search-log.jsonl"
+  },
+  "publication": {
+    "remote": "origin",
+    "branch_pattern": "{name}_llm_wiki",
+    "paths": ["graphify-out", "index"]
+  },
 
   "source_ignored_files": [".gitkeep", ".gitignore", ".DS_Store", "Thumbs.db"]
 }

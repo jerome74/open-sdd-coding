@@ -6,7 +6,7 @@ description: >-
   second brain", "regenerate the wiki", "update OKF bundle". Invoked by /generate-llm-wiki for
   phases 1-5.
 mode: subagent
-model: deepseek/deepseek-v4-flash
+model: deepseek/deepseek-flash
 permission:
   read: allow
   grep: allow

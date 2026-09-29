@@ -113,8 +113,8 @@ python3 .opencode/skills/wiki-semantic-search/scripts/build_index.py
 
 This is what `knowledge-searcher` queries from `/gather-requirements` and `/spec-brainstorm`. Run
 it every time the bundle changes materially, same trigger point as the gate itself — a stale index
-answers on old content. See the `wiki-semantic-search` skill for the format and rationale (lexical,
-not vector — no embedding model or API key is used here).
+answers on old content. See the `wiki-semantic-search` skill for the format and rationale (a
+semantic vector index, built with the local embedding model — no API key, no query-time network).
 
 On success, seal the new state:
 

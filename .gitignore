@@ -13,3 +13,7 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+
+# Local search log — local only (BR-7): must NEVER be committed or published
+logs/
+index/search-log.jsonl

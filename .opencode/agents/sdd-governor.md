@@ -6,7 +6,7 @@ description: >-
   configuration, scripts, diagrams, schemas). It validates and governs generation; it NEVER
   generates artifact content itself. Invoke for the SDD structure-governance checkpoint.
 mode: subagent
-model: deepseek/deepseek-v4-flash
+model: deepseek/deepseek-flash
 temperature: 0.1
 permission:
   read: allow

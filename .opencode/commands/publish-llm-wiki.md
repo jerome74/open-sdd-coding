@@ -14,32 +14,46 @@ This command runs as the **primary agent**.
 ask the user for it before doing anything.
 
 Read `knowledge-config.json` (repo root) first for the configured paths (`graph_out`,
-`bundle_root`, `semantic_index`, `okf_validate_script`).
+`bundle_root`, `semantic_index`, `okf_validate_script`) and the publication destination
+(`publication`: `remote`, `branch_pattern`, `paths`). Never hard-code the remote, branch or paths.
 
 ## Preconditions (verify first — stop if unmet)
 
 1. The OKF conformance gate passes on the bundle: run `/generate-llm-wiki validate` (or directly
    `bash .opencode/skills/okf-open-knowledge-format/scripts/validate.sh graphify-out/wiki`). It
    MUST exit **0**. Never publish with conformance errors.
-2. `index/index.json` exists and was regenerated on the latest bundle. If it is missing or stale,
+2. The semantic index exists (`index/index.json`, or `index/manifest.json` in the compressed
+   layout) and was regenerated on the latest bundle. If it is missing or stale,
    run `python3 .opencode/skills/wiki-semantic-search/scripts/build_index.py` first (see the
    `wiki-semantic-search` skill), then continue.
-3. A git remote named `origin` exists (`git remote -v`). If not, tell the user to add it and stop —
-   do not invent a URL.
+3. The configured `publication.remote` exists (`git remote -v`). If not, tell the user to add it and
+   stop — do not invent a URL.
+4. **Overwrite gate (BR-5).** Run the read-only gate:
+   ```bash
+   python3 scripts/publish_gate.py <name>
+   ```
+   - exit `0` / `decision: proceed` → no index in the destination; continue.
+   - exit `1` / `decision: confirm-required` → an index already exists there: **ask the operator for
+     explicit confirmation before overwriting**. Without it, **do not publish the index** — abort
+     (or, if you continue at all, stage `graphify-out/` only, never `index/`).
+   - exit `2` → report the error and stop.
 
 ## Steps
 
-1. **Branch name.** Derive `<branch>` = `<name>_llm_wiki` from `$1` (e.g. `heartbeat` →
-   `heartbeat_llm_wiki`). Show it to the user and let them override.
+1. **Branch name.** Read `publication.branch_pattern` from `knowledge-config.json` and substitute
+   `{name}` with `$1` (e.g. pattern `{name}_llm_wiki` + `heartbeat` → `heartbeat_llm_wiki`). This is
+   the same branch the overwrite gate inspected. Show it to the user and let them override.
 2. **Create the branch:**
    ```bash
    git checkout -b <branch>
    ```
-3. **Stage ONLY the generated artifacts** — the knowledge bundle (graph + OKF/Obsidian vault) and
-   the semantic index:
+3. **Stage ONLY the generated artifacts** — the paths listed in `publication.paths` (default
+   `graphify-out/ index/`). Use `-A` so files removed in the new generation (e.g. stale
+   `index/parts/*` from a previous compressed index) are deleted in the commit too:
    ```bash
-   git add graphify-out/ index/
+   git add -A graphify-out/ index/   # substitute the configured publication.paths
    ```
+   The wiki and the index go in a **single commit** — the index is never published partially.
 4. **Safety check — no source files:** run `git status` and confirm **NO file under `raw/` is
    staged**. `raw/` is immutable. If anything under `raw/` is staged, unstage it
    (`git restore --staged raw/`) and stop to investigate — never force it through.
@@ -49,9 +63,9 @@ Read `knowledge-config.json` (repo root) first for the configured paths (`graph_
    git commit -m "wiki(ingest): <name> — knowledge graph bundle + semantic index"
    ```
    Replace `<name>` with `$1`.
-6. **Push** and set the upstream:
+6. **Push** and set the upstream, using the configured `publication.remote` (`<remote>`):
    ```bash
-   git push -u origin <branch>
+   git push -u <remote> <branch>
    ```
 7. **Report** the branch name and remind the user to open the Pull Request on their host.
 
@@ -61,7 +75,10 @@ Read `knowledge-config.json` (repo root) first for the configured paths (`graph_
   (`opencode.json` `permission.edit` denies `raw/**`; this is the git-level backstop).
 - **Never push when the OKF gate reports errors** — fix them first (`/generate-llm-wiki okf`, then
   `validate`).
-- Stage only `graphify-out/` and `index/` — nothing else, unless the user explicitly asks.
+- **BR-5 (overwrite confirmation):** when `scripts/publish_gate.py` reports `confirm-required`, get
+  explicit operator confirmation before staging `index/`; without it, do not publish the index.
+- Stage only the configured `publication.paths` (default `graphify-out/` and `index/`) — nothing
+  else, unless the user explicitly asks.
 - Commit message MUST follow `wiki(<action>): <subject> — <what and why>`.
 - This is a git write operation on a new branch: never commit to `main` directly, and confirm the
   branch name with the user before pushing. `git push` prompts for approval (`opencode.json`
