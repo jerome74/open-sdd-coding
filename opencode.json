@@ -5,8 +5,10 @@
       "options": {
         "baseURL": "https://api.deepseek.com/v1"
       }
-    }
+    },
+    "github-copilot": {}
   },
+  "disabled_providers": [],
   "model": "deepseek/deepseek-flash",
   "permission": {
     "edit": {
@@ -21,6 +23,7 @@
     "webfetch": "allow"
   },
   "instructions": [
-    "AGENTS.md"
+    "AGENTS.md",
+    "docs/specs/constitution.md"
   ]
 }
