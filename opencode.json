@@ -10,6 +10,17 @@
   },
   "disabled_providers": [],
   "model": "deepseek/deepseek-flash",
+  "mcp": {
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_TOKEN}"
+      }
+    }
+  },
   "permission": {
     "edit": {
       "raw/**": "deny",
