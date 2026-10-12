@@ -117,6 +117,10 @@ Default `index/index.json`; assenza → `NO_INDEX`, intervista con domande apert
 `/init-new-project` può riscrivere questo file; se OpenCode lo carica una volta per sessione, riapri la sessione.
 
 # RTK Token Optimization Rules
-**Core:** prefissa con `rtk` tutti i comandi shell idonei (RTK comprime l'output, -60/90% token) [citation:14].
-**Mapping:** `ls`/`tree`→`rtk ls` · `cat`/`head`/`tail`→`rtk read` · `grep`/`rg`→`rtk grep` · `find`→`rtk find` · `git status|log|diff`→`rtk git …` · `cargo build`→`rtk cargo build` · `cargo test`→`rtk test cargo test` · `npm test`→`rtk test npm test` · `npm run build`→`rtk err npm run build`.
+**Plugin di progetto (primario):** l'integrazione RTK gira da `.opencode/plugins/rtk.ts` (auto-caricato da OpenCode all'avvio, versionato nel repo). Riscrive automaticamente i comandi shell in `rtk …` via `rtk rewrite`; se `rtk` non è nel PATH → pass-through (nessun blocco). Richiede **riavvio di OpenCode** per essere attivo.
+
+**Fallback manuale:** prefissa con `rtk` i comandi shell idonei (comprime l'output, -60/90% token) [citation:14]. Gruppi principali (`rtk --help`, v0.50.0): file (`ls`/`tree`/`read`) · ricerca (`grep`/`rg`/`find`/`ast-grep`) · git (`git`/`gh`/`glab`) · utilità (`diff`/`log`/`wc`/`json`/`env`/`deps`/`err`/`test`/`summary`) · build/test toolchain (`cargo`/`npm`/`npx`/`bun`/`pnpm`/`docker`/`kubectl`/`tsc`/`jest`/`vitest`/`playwright`/`pytest`/`mypy`/`ruff`) · raw (`run`/`pipe`/`proxy`).
+
+**Misura del risparmio:** `rtk gain -p` (scope progetto: token/percentuale/numero comandi).
+
 **Eccezioni (no RTK):** output già in pipe (`grep x | head`) [citation:1]; comandi senza output (`cd`, `mkdir`, `rm`); `rtk` non installato (`rtk --version`).
