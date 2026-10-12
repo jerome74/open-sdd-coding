@@ -76,7 +76,7 @@ delegate.
 Invoke `@second-brain-keeper` **via the Task tool**, passing the extraction set resolved in
 Phase 0 and the mode. It runs:
 
-1. incremental extraction of the changed roots with `--mode <extraction_mode>` and
+1. incremental extraction of the changed roots in the configured `extraction_mode` (`deep` → `--mode deep`, `standard` → no flag) and
    `--backend <extraction_backend>`, then merge and re-cluster into `<graph_json>`;
 2. Obsidian export into `<bundle_root>`;
 3. OKF conversion of `<bundle_root>` via the `wiki-to-okf` skill;

@@ -27,6 +27,19 @@ Read `knowledge-config.json` (repo root) first; every path below comes from it.
 The caller passes the **extraction set** (the source roots to re-extract) and the mode. If it does
 not, resolve the extraction set yourself in Phase 0.
 
+## Output style — caveman mode (replies only)
+
+Your replies go to the calling agent, not to a human: activate **caveman mode (full)**. Terse
+like smart caveman. All technical substance stays. Only fluff dies. Drop articles, filler,
+hedging, restated instructions, narration of steps. Fragments OK. Technical terms exact.
+
+- Applies **only** to your reply message. **Never** to file content you write — specs, roadmap
+  lines, notes, frontmatter keep their normal language and register.
+- Fixed output formats in this file (report templates, field lists, verdicts) are kept verbatim;
+  only the free text inside them is compressed.
+- Never compress away meaning: paths, IDs, commands, error text, citations, numbers, negations
+  and conditions stay exact and complete.
+
 ## Pipeline checkpoint
 
 Every phase below writes its progress to `<pipeline_state>` (from config) the instant that phase's
@@ -100,7 +113,8 @@ document extraction must reuse. Use the code/AST path the installed graphify exp
 
 ```bash
 # only for code roots in the extraction set — always pass the configured mode and backend
-graphify extract <root> --mode <extraction_mode> --backend <extraction_backend> --out <stage_dir>/<root-slug>
+graphify extract <root> <mode-flag> --backend <extraction_backend> --out <stage_dir>/<root-slug>
+# <mode-flag> = `--mode deep` when extraction_mode is "deep"; omitted when it is "standard" (graphify default)
 ```
 
 When the extraction set contains no code root, Wave 1 is empty.
@@ -115,7 +129,8 @@ document root in the extraction set:
 
 ```bash
 # only for document roots in the extraction set — always pass the configured mode and backend
-graphify extract <root> --mode <extraction_mode> --backend <extraction_backend> --out <stage_dir>/<root-slug>
+graphify extract <root> <mode-flag> --backend <extraction_backend> --out <stage_dir>/<root-slug>
+# <mode-flag> = `--mode deep` when extraction_mode is "deep"; omitted when it is "standard" (graphify default)
 ```
 
 Two rules bind every fragment Wave 2 produces, whichever engine performs it (the configured
@@ -392,7 +407,7 @@ Knowledge pipeline complete:
 - Modify note **body** content only in the two sanctioned places: the wikilink → Markdown-link
   conversion prescribed by `wiki-to-okf`, and Phase 3b deepen. Nowhere else.
 - Never touch source code outside `<graph_out>`.
-- Never drop `--mode <extraction_mode>` from an extraction command.
+- Never drop the configured mode from an extraction command: `extraction_mode: "deep"` → always `--mode deep`; `"standard"` → no `--mode` flag (graphify default), never `--mode standard`.
 - Never prefix a node id or label with a root name during the union.
 - Never proceed past Phase 1, and never write the `1-extract` checkpoint, while
   `dangling_endpoint_edges` or `missing_endpoint_edges` is `> 0`.

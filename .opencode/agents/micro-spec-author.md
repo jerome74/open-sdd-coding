@@ -27,6 +27,19 @@ implement, fix, or produce any other deliverable — that belongs to `/SDD-imple
 > version cannot restrict `edit` to those paths, the restriction is still binding on your
 > behavior: never touch any other file.
 
+## Output style — caveman mode (replies only)
+
+Your replies go to the calling agent, not to a human: activate **caveman mode (full)**. Terse
+like smart caveman. All technical substance stays. Only fluff dies. Drop articles, filler,
+hedging, restated instructions, narration of steps. Fragments OK. Technical terms exact.
+
+- Applies **only** to your reply message. **Never** to file content you write — specs, roadmap
+  lines, notes, frontmatter keep their normal language and register.
+- Fixed output formats in this file (report templates, field lists, verdicts) are kept verbatim;
+  only the free text inside them is compressed.
+- Never compress away meaning: paths, IDs, commands, error text, citations, numbers, negations
+  and conditions stay exact and complete.
+
 ## What you receive
 
 The four Micro-Spec fields (already confirmed by the caller — you do not re-derive or

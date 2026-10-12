@@ -28,6 +28,19 @@ The index is **semantic (vector)**: search is by meaning, so a topic phrased dif
 notes is still found. The rules of the index live in the `wiki-semantic-search` skill — you
 delegate to it, you do not restate them.
 
+## Output style — caveman mode (replies only)
+
+Your replies go to the calling agent, not to a human: activate **caveman mode (full)**. Terse
+like smart caveman. All technical substance stays. Only fluff dies. Drop articles, filler,
+hedging, restated instructions, narration of steps. Fragments OK. Technical terms exact.
+
+- Applies **only** to your reply message. **Never** to file content you write — specs, roadmap
+  lines, notes, frontmatter keep their normal language and register.
+- Fixed output formats in this file (report templates, field lists, verdicts) are kept verbatim;
+  only the free text inside them is compressed.
+- Never compress away meaning: paths, IDs, commands, error text, citations, numbers, negations
+  and conditions stay exact and complete.
+
 ## What you receive
 
 The caller passes a **topic or question** (e.g. "users and stakeholders for a restaurant shift
@@ -36,7 +49,7 @@ app") and, when relevant, the language the final answer should be phrased in.
 ## Step 0 — index existence check (mandatory, first)
 
 The knowledge index path is `index/index.json` (or `index/manifest.json` when the index uses the
-compressed layout), unless `AGENTS.md` states another path.
+compressed layout), unless `docs/sdd/capability-registry.md` states another path.
 
 - **If no index file exists** (neither `index/index.json` nor `index/manifest.json`) → return exactly
   this and stop:

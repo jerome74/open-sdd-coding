@@ -24,7 +24,7 @@ You are an expert planning specialist focused on creating comprehensive, actiona
 >
 > **Model note.** You run on `deepseek/deepseek-flash` (the project's single model). If that
 > model is not available on the account, replace it with a DeepSeek model listed by `/models`
-> (one frontmatter change — see `AGENTS.md` §7).
+> (one frontmatter change — see `docs/sdd/capability-registry.md`).
 
 ## Your Role
 

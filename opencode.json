@@ -10,7 +10,7 @@
         "deepseek-flash": {
           "limit": {
             "context": 1000000,
-            "input": 115000,
+            "input": 64000,
             "output": 384000
           }
         }
@@ -22,6 +22,21 @@
   "model": "deepseek/deepseek-flash",
   "plugin": ["@keakon/opencode-dcp@1.2.8", "agent-cache-optimizer@0.6.1"],
   "mcp": {
+    "tavily": {
+      "type": "local",
+      "command": ["npx", "-y", "tavily-mcp"],
+      "enabled": false
+    },
+    "fetch": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-fetch"],
+      "enabled": false
+    },
+    "docs": {
+      "type": "local",
+      "command": ["npx", "-y", "@upstash/context7-mcp"],
+      "enabled": false
+    },
     "github": {
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp/",
@@ -45,7 +60,6 @@
     "webfetch": "allow"
   },
   "instructions": [
-    "AGENTS.md",
-    "docs/specs/constitution.md"
+    "AGENTS.md"
   ]
 }

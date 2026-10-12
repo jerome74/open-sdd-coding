@@ -21,12 +21,14 @@
     "Decision", "Reference", "Playbook", "Community Overview"
   ],
 
-  "extraction_mode": "deep",
+  "extraction_mode": "standard",
+  "$comment_extraction_mode": "\"standard\" = graphify default semantic extraction (no --mode flag; graphify 0.9.71 offers only --mode deep). \"deep\" = aggressive INFERRED-edge extraction: more LLM tokens. Token-saving default: standard.",
   "extraction_backend": "deepseek",
   "$comment_extraction_backend": "RESOLVED on first run (graphify 0.9.53): backend 'deepseek' is the native OpenAI-compatible DeepSeek backend — env DEEPSEEK_API_KEY (set), base https://api.deepseek.com, default model deepseek-flash (matches the project model matrix). Resolved live with `opencode` + `graphify` installed, as the OTQ required.",
   "okf_enrichment": true,
   "deepen": true,
-  "deepen_scope": "all",
+  "deepen_scope": 20,
+  "$comment_deepen_scope": "Integer N = deepen only the top N hubs (graphify god-nodes --top N); \"all\" rewrites every concept note each cycle (most LLM tokens). Token-saving default: 20.",
 
   "okf_validate_script": ".opencode/skills/okf-open-knowledge-format/scripts/validate.sh",
   "semantic_index": "index/index.json",
