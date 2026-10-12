@@ -3,18 +3,29 @@
   "provider": {
     "deepseek": {
       "options": {
-        "baseURL": "https://api.deepseek.com/v1"
+        "baseURL": "https://api.deepseek.com/v1",
+        "setCacheKey": true
+      },
+      "models": {
+        "deepseek-flash": {
+          "limit": {
+            "context": 1000000,
+            "input": 115000,
+            "output": 384000
+          }
+        }
       }
     },
     "github-copilot": {}
   },
   "disabled_providers": [],
   "model": "deepseek/deepseek-flash",
+  "plugin": ["@keakon/opencode-dcp@1.2.8", "agent-cache-optimizer@0.6.1"],
   "mcp": {
     "github": {
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp/",
-      "enabled": true,
+      "enabled": false,
       "oauth": false,
       "headers": {
         "Authorization": "Bearer {env:GITHUB_TOKEN}"
