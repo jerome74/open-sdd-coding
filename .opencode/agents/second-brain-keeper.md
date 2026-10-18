@@ -27,6 +27,13 @@ Read `knowledge-config.json` (repo root) first; every path below comes from it.
 The caller passes the **extraction set** (the source roots to re-extract) and the mode. If it does
 not, resolve the extraction set yourself in Phase 0.
 
+An extraction-set entry is `{path, stage_slug, origin, label}`. When `stage_slug` is supplied it is
+**authoritative**: use it verbatim as `<stage_dir>/<stage_slug>`, skip basename derivation, and never
+append a collision suffix. If it collides with another entry's slug, stop and report a configuration
+error — a silent rename would create a second stage directory and break incremental reuse. When it is
+absent, keep the legacy rule below with the existing names unchanged (`raw` stays `raw`, `docs/specs`
+stays `spec`); renaming them would force a full paid re-extraction.
+
 ## Output style — caveman mode (replies only)
 
 Your replies go to the calling agent, not to a human: activate **caveman mode (full)**. Terse
@@ -82,9 +89,12 @@ python3 scripts/source_watch.py --json
 
 Resolve the **extraction set**:
 
-- **INIT** — every non-empty entry of `source_roots`, plus any extra roots passed as argument.
-- **UPDATE** — only the roots that `source_watch.py` reports as changed. Unchanged roots keep
-  their existing staged graph and are **not** re-extracted.
+- **INIT** — every non-empty entry of `source_roots`, plus every `origin: derived` entry that
+  contains at least one `.md`, plus any extra roots passed as argument.
+- **UPDATE** — only the roots that `source_watch.py` reports as changed, plus every `origin: derived`
+  entry the caller included. Unchanged roots keep their existing staged graph and are **not**
+  re-extracted.
+- The derived root is never added to `source_roots`, never sealed, never re-converted.
 
 If the extraction set is empty and the bundle already exists, stop: there is nothing to do.
 
@@ -100,11 +110,14 @@ Unless `mode` is `okf` (Phases 1–2 do not run in that mode), initialize the ch
 so that, when the union below deduplicates by `id`, the AST node (the canonical `source_file`) is
 already present before any document fragment attaches to it.
 
-**Root → staging slug**, stable between runs: basename of the root (`raw` → `raw`, `docs/specs` →
-`spec`), with a disambiguating prefix if two roots share a basename. **Skip empty roots** — do not
-extract them, and do not pass their (non-existent) graph to the union. The rules below apply per
+**Root → staging slug**, stable between runs: an entry's explicit `stage_slug` wins and is
+authoritative; otherwise the basename of the root (`raw` → `raw`, `docs/specs` → `spec`), with a
+disambiguating prefix if two roots share a basename. A collision between an explicit `stage_slug` and
+another entry's slug is a configuration error: stop; never rename silently. **Skip empty roots** — do
+not extract them, and do not pass their (non-existent) graph to the union. The rules below apply per
 wave, to each root in the extraction set; in `update` mode unchanged roots keep their existing
-staged graph.
+staged graph. The converted document root is a **document root** (no top-level `manifest.json`) and
+therefore runs in Wave 2, reusing the id-map.
 
 **Wave 1 — code roots (AST ids first).** For each code root in the extraction set, run its AST
 extraction first. AST extraction is local and keyless: it produces the **real graphify ids** that
@@ -167,6 +180,18 @@ system, so the union deduplicates by `id` and prefixes nothing:
   never silently dropped;
 - ids are never rewritten to `<root>::<id>`.
 
+A staged graph enters the union only if its root still holds extractable content. In particular, when
+the converted root contains no `.md` after conversion, exclude
+`<stage_dir>/<document_conversion.stage_slug>` from the union for this run and report that
+document-derived nodes were dropped — otherwise a wipe (`all`) followed by a failed conversion would
+resurrect deleted notes.
+
+The converted root's staged graph is always part of the union, whether or not it was re-extracted
+this run. When `document_conversion.enabled` is true, locate it from `document_conversion.out_dir`
+plus the slug of `document_conversion.source_root`, staged at
+`<stage_dir>/<document_conversion.stage_slug>`; include that staged graph whenever the root exists and
+contains at least one `.md`, even when it is not in this run's extraction set.
+
 With a single configured root, `graphify extract <root> --out .` writes `./<graph_out>/graph.json`
 directly and no union is needed — but the re-cluster and the health check below still run.
 
@@ -205,8 +230,10 @@ re-extract that root, then re-run the union and the check. Never publish a wiki 
 
 `<graph_json>` and `<graph_out>/GRAPH_REPORT.md` exist and are non-empty. Report node, edge, and
 community counts. The union has not prefixed any node id, and the health check reports
-`dangling_endpoint_edges: 0` and `missing_endpoint_edges: 0`. Only once all of this is confirmed,
-write the checkpoint (`last_phase_completed: "1-extract"`).
+`dangling_endpoint_edges: 0` and `missing_endpoint_edges: 0`. Nodes whose `source_file` sits under
+the converted root are expected. Nodes for `.conversion-map.json`, extracted media, or `report.md`
+are not — report them if they appear. Only once all of this is confirmed, write the checkpoint
+(`last_phase_completed: "1-extract"`).
 
 ## Phase 2 — Export the Obsidian vault
 
@@ -394,11 +421,16 @@ that means "nothing to resume".
 Knowledge pipeline complete:
   Changes:  <root>: +A ~M -D   (per root)
   Extracted: <roots re-extracted>   (unchanged roots reused)
+  Converted: <converted> converted, <skipped> skipped, <errors> errors — <derived_root>
+  Derived:   stage <stage_slug> — <md> Markdown files — <extracted this run | reused | not in extraction set> (ready=<yes|no>, indexed=<yes|no>)
   Graph:    <N> nodes, <E> edges, <C> communities
   Bundle:   <F> files in <bundle_root>
   Deepen:   <PASS|INCOMPLETE|not reached> — <N> notes verified expanded and cited (failures listed)
   OKF:      <PASS|FAIL> — <errors> errors, <warnings> warnings
   Report:   <graph_out>/GRAPH_REPORT.md
+
+  Conversion failures:   (only when <errors> > 0)
+    - <root>/<file>: <error>
 ```
 
 ## Constraints
@@ -412,6 +444,9 @@ Knowledge pipeline complete:
 - Never proceed past Phase 1, and never write the `1-extract` checkpoint, while
   `dangling_endpoint_edges` or `missing_endpoint_edges` is `> 0`.
 - Never delete `<stage_dir>` — it is the incremental state.
+- Never write under the converted root (`origin: derived`); it is read-only extraction input.
+- If an entry supplies `stage_slug`, use it verbatim; never re-derive it or rename a colliding stage.
+- Never add the converted root to `source_roots` or include it in the seal.
 - Never seal the source manifest after a failed build.
 - If extraction fails (LLM error, timeout), report it and stop — do not export a stale graph.
 - Never write `5-sealed` to `<pipeline_state>` unless every phase, including the Phase 3b

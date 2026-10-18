@@ -10,8 +10,8 @@
         "deepseek-flash": {
           "limit": {
             "context": 1000000,
-            "input": 64000,
-            "output": 384000
+            "input": 900000,
+            "output": 100000
           }
         }
       }

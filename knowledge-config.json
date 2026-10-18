@@ -12,6 +12,16 @@
 
   "bundle_root": "graphify-out/wiki",
 
+  "document_conversion": {
+    "enabled": true,
+    "source_root": "raw",
+    "out_dir": "graphify-out/derived",
+    "cli": ".opencode/skills/document-to-markdown/scripts/convert_documents.py",
+    "stage_slug": "raw-converted",
+    "stage_label": "raw (converted documents)"
+  },
+  "$comment_document_conversion": "Binary documents under source_root are converted to Markdown at out_dir/<root-slug> and extracted as an extra Graphify root staged at <stage_dir>/<stage_slug>. Conversion runs only in /generate-llm-wiki modes update and all. Per-file failures are non-blocking (CLI exit 1); CLI exit 2 (config/unsafe path/lock) is fatal. stage_slug must differ from every source-root staging slug.",
+
   "okf_version": "0.1",
   "reserved_files": ["index.md", "log.md"],
   "recommended_frontmatter": ["type", "title", "description", "tags", "timestamp", "resource"],
@@ -63,8 +73,10 @@
   "publication": {
     "remote": "origin",
     "branch_pattern": "{name}_llm_wiki",
-    "paths": ["graphify-out", "index"]
+    "paths": ["graphify-out", "index"],
+    "exclude": ["graphify-out/derived"]
   },
+  "$comment_publication_exclude": "Repo-relative path prefixes that /publish-llm-wiki removes from the git index after staging. Prefixes, not globs. Derived extraction input is regenerable and must not be published.",
 
   "source_ignored_files": [".gitkeep", ".gitignore", ".DS_Store", "Thumbs.db"]
 }
