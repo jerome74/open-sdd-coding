@@ -17,3 +17,10 @@ Thumbs.db
 # Local search log — local only (BR-7): must NEVER be committed or published
 logs/
 index/search-log.jsonl
+
+# Active knowledge base state (scripts/kb_active.py) and its config backup
+.kb-active.json
+knowledge-config.json.bak
+
+# Compass local cache (regenerable; compass-out/ is published instead)
+.compass/cache/

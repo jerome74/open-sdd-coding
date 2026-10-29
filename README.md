@@ -109,6 +109,10 @@ account, sostituiscilo con un modello DeepSeek elencato da `/models`: il default
 Trasforma le source root (`raw/`, `docs/specs/`) in un grafo della conoscenza e poi in un
 artefatto che è insieme vault Obsidian e bundle **OKF v0.1**.
 
+Esistono **due pipeline separate** che producono lo stesso contratto OKF: questa, basata su
+graphify, e quella strutturale basata su Compass descritta in §6c. Una sola KB è attiva per volta
+(vedi §6c).
+
 **Prerequisito:** `graphify` sul PATH — `uv tool install graphifyy` (graphify **0.9.25**). È una
 dipendenza esterna deliberata (costituzione §principio 8).
 
@@ -140,6 +144,47 @@ raw/ + docs/specs/  →  graphify-out/graph.json  →  graphify-out/wiki/  →  
   `OTQ-resolve-with-opencode` — nel repo di riferimento era `claude-cli`; scegli il backend che
   `graphify extract --help` elenca per questo ambiente al primo run. Fino ad allora l'estrazione
   fallisce con un messaggio chiaro.
+
+## 6c. Pipeline della conoscenza (strutturale, Compass)
+
+Seconda pipeline, affiancata a quella graphify: stesse fasi 0–5, stessi consumatori, stesso bundle
+OKF validato dallo **stesso** gate. Cambia il motore: [Compass](https://github.com/crabbuild/compass)
+al posto di graphify. È **strutturale e zero-token**: non chiama LLM e non estrae concetti dalla
+prosa.
+
+**Prerequisito:** `compass` sul PATH, versione **≥ 0.4.2** (asset di release ufficiale). Se manca o è
+più vecchio la pipeline si ferma e chiede l'installazione: non installa da sola e non esegue mai
+`compass install` nel repo (scriverebbe `AGENTS.md`, `.agents/`, regole editor).
+
+```
+raw/ + docs/specs/  →  compass-out/graph.json  →  compass-out/adapted/graph.json
+                    →  compass-out/obsidian/  →  index-compass/index.json
+```
+
+| Comando | Cosa fa |
+|---|---|
+| `/generate-llm-wiki-compass [update\|check\|all\|okf\|validate\|query "<q>"\|report]` | Fase 0 (preflight versione/corpus, change-detect con `scripts/source_watch.py --config knowledge-config.compass.json`) sull'agente primario; fasi 1–5 (build → adapter + contract check → export Obsidian → conversione OKF → deepen → gate → seal) in `@compass-keeper` |
+| `/publish-llm-wiki-compass <name>` | commit di `compass-out/` + `index-compass/` sul branch `<name>_compass_wiki` e push |
+
+- Tutti i path e le leve vivono in **`knowledge-config.compass.json`**: la config graphify non viene
+  mai letta implicitamente.
+- `.compass/config.toml` è **generato** da `scripts/compass_config_gen.py`; `compass init` non si usa
+  (fallisce con exit 2 su corpus vuoto).
+- Compass 0.4.2 non emette `label`/`source_file`: `scripts/compass_graph_adapter.py` produce
+  `compass-out/adapted/graph.json`, e `scripts/compass_graph_check.py` verifica il contratto
+  (bloccante) prima dell'OKF.
+- Nessun pre-pass di conversione: Compass legge PDF/Office nativamente. Nessuna estrazione
+  semantica: il backend opzionale è spento per default.
+- Il gate è lo stesso: `bash .opencode/skills/okf-open-knowledge-format/scripts/validate.sh
+  compass-out/obsidian`. `compass-out/cache/`, `snapshots/` e `store/` non vengono pubblicati.
+- **Una sola KB attiva:** `graph_json`, `bundle_root` e `semantic_index` in `knowledge-config.json`
+  puntano alla pipeline che ha completato l'ultimo ciclo con successo. Ogni pipeline lo aggiorna da
+  sé in Fase 5 con `python3 scripts/kb_active.py set graphify|compass`. La KB inattiva si interroga
+  solo con `--config` esplicito.
+- Evidenza misurata su CLI e schema (versione, flag reali, layout, copertura campi) in
+  `docs/sdd/compass-verification.md`; mappa degli asset in `docs/sdd/capability-registry.md`.
+- **Limite attuale:** con il corpus vuoto (`raw/` e `docs/specs/` contengono solo `.gitkeep`) la
+  pipeline si ferma al preflight; serve contenuto reale prima del primo run.
 
 ## 7. Verifica
 

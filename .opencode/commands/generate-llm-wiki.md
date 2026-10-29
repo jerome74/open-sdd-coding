@@ -208,6 +208,17 @@ python3 scripts/source_watch.py --update
 Do this **only after** the gate passes. Sealing a failed build would hide the pending changes from
 the next run.
 
+**Then point the active knowledge base at this pipeline** — only after the gate passed and the seal
+succeeded:
+
+```bash
+python3 scripts/kb_active.py set graphify
+```
+
+This rewrites only `graph_json`, `bundle_root` and `semantic_index` in `knowledge-config.json`, so
+the consumers read this pipeline's knowledge base and not the Compass one. A pointer failure is a
+warning, not a build failure: the bundle stays valid and the previously active KB stays selected.
+
 ## Modes
 
 | Mode | Behaviour |

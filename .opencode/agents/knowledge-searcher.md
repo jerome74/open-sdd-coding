@@ -48,11 +48,12 @@ app") and, when relevant, the language the final answer should be phrased in.
 
 ## Step 0 — index existence check (mandatory, first)
 
-The knowledge index path is `index/index.json` (or `index/manifest.json` when the index uses the
-compressed layout), unless `docs/sdd/capability-registry.md` states another path.
+The knowledge index path is the `semantic_index` value in `knowledge-config.json` (default
+`index/index.json`), unless `docs/sdd/capability-registry.md` states another path. When the index
+uses the compressed layout, look for `manifest.json` in the same directory.
 
-- **If no index file exists** (neither `index/index.json` nor `index/manifest.json`) → return exactly
-  this and stop:
+- **If no index file exists** (neither the configured index nor its compressed `manifest.json`) →
+  return exactly this and stop:
   ```
   Found: no
   Summary: NO_INDEX — no knowledge index in this project; proceed with a plain open question.
@@ -66,7 +67,7 @@ compressed layout), unless `docs/sdd/capability-registry.md` states another path
 Run the semantic search over the index:
 
 ```bash
-python3 .opencode/skills/wiki-semantic-search/scripts/query_index.py "<topic or question>" --top 5
+python3 .opencode/skills/wiki-semantic-search/scripts/query_index.py "<topic or question>" --top 5 --config knowledge-config.json
 ```
 
 It prints JSON `{"query", "esito", "results"}`. Act on `esito`:
