@@ -17,3 +17,6 @@ Thumbs.db
 # Local search log — local only (BR-7): must NEVER be committed or published
 logs/
 index/search-log.jsonl
+
+# Private skill-run snapshots and recovery journals
+/.rollback-state/

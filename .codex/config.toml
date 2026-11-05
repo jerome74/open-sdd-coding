@@ -1,0 +1,52 @@
+# Codex CLI 0.166.0; OpenCode configuration remains independent.
+# No model/provider/auth override: use the operator's existing Codex installation.
+approval_policy = "on-request"
+default_permissions = "sdd"
+developer_instructions = "Before using migrated workflows, read .codex/instructions.md. Root AGENTS.md remains binding; adapt only OpenCode runtime notation. Native read-only roles must not be spawned from writable sessions; use the embedded fallback or the read-only adapter."
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4
+
+[features]
+apps = false
+plugins = false
+
+[permissions.sdd]
+extends = ":workspace"
+description = "SDD workspace; immutable sources and original OpenCode are read-only"
+
+[permissions.sdd.filesystem.":workspace_roots"]
+"raw" = "read"
+".opencode" = "read"
+
+[permissions.sdd.network]
+enabled = false
+
+[mcp_servers.tavily]
+command = "npx"
+args = ["-y", "tavily-mcp"]
+enabled = false
+
+[mcp_servers.fetch]
+command = "uvx"
+args = ["mcp-server-fetch"]
+enabled = false
+
+[mcp_servers.docs]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+enabled = false
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GITHUB_TOKEN"
+enabled = false
+
+[[hooks.PreToolUse]]
+matcher = "^Bash$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/scripts/codex_rtk_hook.py"'
+timeout = 5

@@ -1,0 +1,3 @@
+# Prefix-based guardrails; not a universal shell-program analyzer.
+prefix_rule(pattern = ["git", "push"], decision = "prompt")
+prefix_rule(pattern = ["rm", ["-rf", "-fr"]], decision = "forbidden")
