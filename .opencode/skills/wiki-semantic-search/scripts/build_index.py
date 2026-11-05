@@ -257,8 +257,9 @@ def _write_json(path: Path, data: object) -> None:
 
 def _write_gz_json(path: Path, data: object) -> int:
     raw = json.dumps(data, ensure_ascii=False).encode("utf-8")
-    with gzip.open(path, "wb") as handle:
-        handle.write(raw)
+    with path.open("wb") as output:
+        with gzip.GzipFile(filename="", fileobj=output, mode="wb", mtime=0) as handle:
+            handle.write(raw)
     return path.stat().st_size
 
 
@@ -384,6 +385,20 @@ def build_index(
 
         status = STATUS_WITH_ERRORS if errors else STATUS_OK
         payload = build_payload(items, errors, config["bundle_root"], active.embedding_id, status)
+        # Keep existing generation metadata on an identical content rebuild. The status
+        # sidecar still records the actual run time; compressed bytes are deterministic.
+        content = {key: value for key, value in payload.items() if key != "generated_at"}
+        payload["content_hash"] = hashlib.sha256(
+            json.dumps(content, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        ).hexdigest()
+        previous_file = index_file if index_file.is_file() else index_root / "manifest.json"
+        try:
+            previous = json.loads(previous_file.read_text(encoding="utf-8"))
+            if previous.get("content_hash") == payload["content_hash"]:
+                payload["generated_at"] = previous["generated_at"]
+        except (OSError, ValueError, KeyError, TypeError):
+            pass  # First build or legacy metadata; existing migration remains additive.
+
 
         stage = index_root.parent / (index_root.name + ".tmp")
         if stage.exists():

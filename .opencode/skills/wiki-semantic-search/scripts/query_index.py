@@ -101,6 +101,7 @@ def cosine(a: list[float], b: list[float]) -> float:
 
 def format_result(score: float, item: dict, expanded: bool = False) -> dict:
     return {
+        "id": item.get("id"),
         "score": round(score, 4),
         "docTitle": item.get("docTitle"),
         "sourcePath": item.get("sourcePath"),
@@ -182,7 +183,7 @@ def search(
 
     try:
         index = load_index(index_file)
-    except (FileNotFoundError, OSError) as exc:
+    except (FileNotFoundError, OSError, ValueError, TypeError, KeyError) as exc:
         return {"esito": ESITO_RUNTIME, "query": query, "results": [], "error": str(exc)}
 
     if metric != "cosine":
@@ -212,7 +213,7 @@ def search(
         if not vector:
             continue
         scored.append((cosine(query_vector, vector), item))
-    scored.sort(key=lambda pair: pair[0], reverse=True)
+    scored.sort(key=lambda pair: (-pair[0], str(pair[1].get("sourcePath")), pair[1].get("chunkIndex", 0)))
 
     results = [format_result(score, item) for score, item in scored[:top_k] if score >= min_score]
     if results:

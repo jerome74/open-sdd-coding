@@ -199,6 +199,25 @@ it every time the bundle changes materially, same trigger point as the gate itse
 answers on old content. See the `wiki-semantic-search` skill for the format and rationale (a
 semantic vector index, built with the local embedding model — no API key, no query-time network).
 
+After the final wiki enrichment, successful OKF gate, and successful semantic index rebuild,
+build the LPG sidecar and then seal the common content manifest:
+
+```bash
+python3 scripts/graph_build.py build
+python3 scripts/graph_build.py seal
+```
+
+Read `lpg_json`, `lpg_input`, `build_manifest` and `graph_retrieval.project_id` from config.
+`lpg_input` may name an explicitly curated LPG envelope with verified evidence and chunk
+mappings. If null, the builder preserves the Graphify JSON as a legacy import with incomplete
+provenance; it does not invent mappings, evidence or semantic relation types. Report this
+limitation: typed expansion requires explicit mappings/evidence. Never synthesize them from
+title/filename similarity. Graphify's existing JSON/export stays intact.
+
+A failed build/seal is blocking: no source seal and no completion declaration. Hash manifests
+are computed only after wiki and index exist; wiki timestamps newer than extraction are normal.
+Do not run these mutating commands in `check`, `validate`, `query` or `report` modes.
+
 On success, seal the new state:
 
 ```bash

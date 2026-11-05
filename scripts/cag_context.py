@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
-"""CAG Context Assembler — build the assistant's grounding context (FR-010, FR-011).
+"""CAG adapter for semantic-first typed graph retrieval (FR-010/FR-011).
 
-Given a question, it runs the semantic search (spec 02/04), then decides how to attach the
-knowledge graph (`graph_json` from `knowledge-config.json`, produced by `graphify`):
-
-- graph **<= threshold** (`cag.graph_threshold_kb`, default 100 KB) → the **whole** graph;
-- graph **> threshold** → only the **sub-graph** connected to the found notes;
-- graph **missing**, **older than the wiki**, or **unreadable** → semantic results only + a warning.
-
-It records the FR-011 signals (`kb_consulted`, `note_citate`, `graph_used`) and appends one entry to
-the **local** search log (spec 06). It performs no generation and no network call.
-
-Usage
-    python3 scripts/cag_context.py "<question>" [--top K] [--config PATH]
+Existing notes/citations/log fields are preserved. Graph attachment is bounded and
+requires a valid LPG sidecar and content manifest; legacy Graphify JSON is never
+attached wholesale. Use graph_build.py to create the sidecar after wiki/index build.
 """
 
 from __future__ import annotations
@@ -20,7 +11,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,6 +20,8 @@ SKILL_SCRIPTS = REPO_ROOT / ".opencode" / "skills" / "wiki-semantic-search" / "s
 if str(SKILL_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SKILL_SCRIPTS))
 import query_index  # noqa: E402
+
+import graph_retrieval
 
 import search_log  # noqa: E402  (sibling logger, local only)
 
@@ -48,86 +40,6 @@ def utc_now() -> str:
 
 def load_config(config_path: Path) -> dict:
     return query_index.build_index.load_config(config_path)
-
-
-def load_graph(graph_path: Path) -> tuple[list[dict], list[dict]]:
-    data = json.loads(graph_path.read_text(encoding="utf-8"))
-    nodes = data.get("nodes") or []
-    edges = data.get("edges") or data.get("links") or []
-    return nodes, edges
-
-
-def graph_is_stale(graph_path: Path, bundle_root: Path) -> bool:
-    """The graph is stale when it predates the newest note in the wiki bundle."""
-    if not bundle_root.is_dir():
-        return False
-    newest = max((path.stat().st_mtime for path in bundle_root.rglob("*.md")), default=0.0)
-    return graph_path.stat().st_mtime < newest
-
-
-def select_subgraph(nodes: list[dict], edges: list[dict], notes: list[dict]) -> tuple[list[dict], list[dict]]:
-    """Keep the nodes connected to the found notes (by title/stem) plus their incident edges."""
-    keys: set[str] = set()
-    for note in notes:
-        title = str(note.get("docTitle") or "").strip().lower()
-        stem = Path(str(note.get("sourcePath") or "")).stem.strip().lower()
-        if title:
-            keys.add(title)
-        if stem:
-            keys.add(stem)
-    if not keys:
-        return [], []
-
-    def matches(node: dict) -> bool:
-        label = str(node.get("label", "")).lower()
-        source = str(node.get("source_file", "")).lower()
-        return any(key in label or key in source for key in keys)
-
-    selected_ids = {node.get("id") for node in nodes if matches(node)}
-    sub_edges = [edge for edge in edges if edge.get("source") in selected_ids or edge.get("target") in selected_ids]
-    connected_ids = set(selected_ids)
-    for edge in sub_edges:
-        connected_ids.add(edge.get("source"))
-        connected_ids.add(edge.get("target"))
-    sub_nodes = [node for node in nodes if node.get("id") in connected_ids]
-    return sub_nodes, sub_edges
-
-
-def _resolve_graph(graph_file: Path, bundle_root: Path, notes: list[dict], threshold_bytes: int) -> dict:
-    """Decide how to attach the graph; degrade cleanly on missing/stale/unreadable/broken."""
-    info: dict = {
-        "graph_present": graph_file.is_file(),
-        "graph_stale": False,
-        "graph_used": "absent",
-        "graph_size_kb": None,
-        "warning": None,
-        "graph": None,
-    }
-    if not info["graph_present"]:
-        info["warning"] = "knowledge graph missing — semantic search only"
-        return info
-
-    size = graph_file.stat().st_size
-    info["graph_size_kb"] = round(size / 1024, 2)
-    if graph_is_stale(graph_file, bundle_root):
-        info["graph_stale"] = True
-        info["warning"] = "knowledge graph is older than the wiki — semantic search only"
-        return info
-
-    try:
-        nodes, edges = load_graph(graph_file)
-    except (OSError, json.JSONDecodeError) as exc:
-        info["warning"] = f"knowledge graph unreadable ({exc}) — semantic search only"
-        return info
-
-    if size <= threshold_bytes:
-        info["graph_used"] = "whole"
-        info["graph"] = {"nodes": nodes, "edges": edges}
-    else:
-        sub_nodes, sub_edges = select_subgraph(nodes, edges, notes)
-        info["graph_used"] = "subgraph"
-        info["graph"] = {"nodes": sub_nodes, "edges": sub_edges}
-    return info
 
 
 def _write_search_log(config: dict, config_path: Path, package: dict, strategy: str) -> bool:
@@ -159,33 +71,34 @@ def assemble(
     bundle_root: Path | None = None,
     log: bool = True,
 ) -> dict:
-    """Return the CAG context package. Degrades cleanly; never raises for expected conditions."""
-    started = time.perf_counter()
+    """Compatibility adapter; detailed fallback diagnostics remain visible."""
     config = load_config(config_path)
-    repo = config_path.resolve().parent
-    cag_cfg = {**{"graph_threshold_kb": DEFAULT_GRAPH_THRESHOLD_KB}, **config.get("cag", {})}
-    threshold_bytes = int(cag_cfg["graph_threshold_kb"]) * 1024
-    graph_file = graph_path or (repo / config["graph_json"])
-    bundle = bundle_root or (repo / config["bundle_root"])
-
-    search = query_index.search(config_path=config_path, query=query, top_k=top_k, runner=runner)
-    notes = search.get("results", [])
-    strategy = query_index.read_retrieval_config(config)[0]
-
-    graph_info = _resolve_graph(graph_file, bundle, notes, threshold_bytes)
-    package: dict = {
-        "query": query,
-        "esitoRicerca": search["esito"],
+    options = {k: v for k, v in config.get("graph_retrieval", {}).items()
+               if k in {"max_hops", "relation_types", "direction", "max_nodes",
+                        "max_edges", "max_tokens", "timeout_ms"}}
+    result = graph_retrieval.retrieve(config_path=config_path, query=query, top_k=top_k,
+                                     runner=runner, graph_path=graph_path,
+                                     bundle_root=bundle_root, **options)
+    state = result["graph_status"]
+    graph_file = graph_path or (config_path.resolve().parent / config.get("lpg_json", config["graph_json"]))
+    esito = result.get("esito", "erroreRuntime")
+    package = {
+        **result,
+        "esitoRicerca": esito,
         "kb_consulted": True,
-        "note_citate": [{"docTitle": n.get("docTitle"), "sourcePath": n.get("sourcePath")} for n in notes],
-        "graph_threshold_kb": cag_cfg["graph_threshold_kb"],
-        "elapsed_ms": round((time.perf_counter() - started) * 1000, 2),
-        "notes": notes,
-        **graph_info,
+        "note_citate": [{"docTitle": n.get("docTitle"), "sourcePath": n.get("sourcePath")}
+                        for n in result["notes"]],
+        "graph_threshold_kb": config.get("cag", {}).get("graph_threshold_kb", DEFAULT_GRAPH_THRESHOLD_KB),
+        "graph_present": graph_file.is_file(),
+        "graph_stale": state == "stale_artifacts",
+        "graph_used": "subgraph" if result["relations"] else "absent",
+        "graph_size_kb": round(graph_file.stat().st_size / 1024, 2) if graph_file.is_file() else None,
+        "warning": "; ".join(result["diagnostics"]) or None,
+        "graph": {"paths": result["node_paths"], "edges": [x["edge"] for x in result["relations"]]}
+                 if result["relations"] else None,
     }
-
     if log:
-        _write_search_log(config, config_path, package, strategy)
+        _write_search_log(config, config_path, package, query_index.read_retrieval_config(config)[0])
     return package
 
 
