@@ -78,5 +78,21 @@
   },
   "$comment_publication_exclude": "Repo-relative path prefixes that /publish-llm-wiki removes from the git index after staging. Prefixes, not globs. Derived extraction input is regenerable and must not be published.",
 
-  "source_ignored_files": [".gitkeep", ".gitignore", ".DS_Store", "Thumbs.db"]
+  "source_ignored_files": [".gitkeep", ".gitignore", ".DS_Store", "Thumbs.db"],
+  "lpg_json": "graphify-out/lpg.json",
+  "build_manifest": "graphify-out/build-manifest.json",
+  "graph_retrieval": {
+    "project_id": "open-sdd-coding",
+    "max_hops": 1,
+    "max_nodes": 40,
+    "max_edges": 60,
+    "max_tokens": 4000,
+    "timeout_ms": 2000
+  },
+  "traceability": {
+    "input": "docs/sdd/traceability-input.json",
+    "constitution": "docs/specs/constitution.md",
+    "capability_registry": "docs/sdd/capability-registry.md"
+  },
+  "lpg_input": null
 }

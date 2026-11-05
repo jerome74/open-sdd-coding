@@ -7,8 +7,9 @@ stessi ruoli e lo stesso flusso della pipeline SDD, riespressi con le primitive 
 
 ## 1. Cos'è
 
-Non è un codebase applicativo: niente `package.json`, niente build, niente test suite. I
-"programmi" sono **comandi**, **subagent** e **skill** OpenCode che guidano una pipeline:
+Non è un codebase applicativo: il framework contiene **comandi**, **subagent**, **skill**
+OpenCode e script Python di supporto, con test stdlib per il retrieval GraphRAG e la tracciabilità.
+Questi componenti guidano una pipeline:
 
 ```
 docs/input/*.md            (requisito funzionale)
@@ -140,6 +141,24 @@ raw/ + docs/specs/  →  graphify-out/graph.json  →  graphify-out/wiki/  →  
   `OTQ-resolve-with-opencode` — nel repo di riferimento era `claude-cli`; scegli il backend che
   `graphify extract --help` elenca per questo ambiente al primo run. Fino ad allora l'estrazione
   fallisce con un messaggio chiaro.
+
+### Retrieval GraphRAG e analisi SDD
+
+Il retrieval ora combina l'indice semantico esistente con un sidecar LPG versionato, mapping
+espliciti, traversal tipizzato limitato e passaggi citati. Un manifest hash comune sostituisce
+il controllo di freshness basato sui timestamp. Il JSON Graphify originale resta invariato;
+un import legacy senza provenance non abilita automaticamente l'espansione relazionale.
+
+```bash
+python3 scripts/graph_retrieval.py "Quali eccezioni alla regola?" --max-hops 2 --direction both
+python3 scripts/cag_context.py "Quali evidenze disponibili?"
+python3 scripts/traceability.py
+python3 -m unittest discover -s tests -v
+```
+
+L'analisi SDD legge solo documenti selezionati e riferimenti espliciti, senza modificare la
+roadmap. Senza constitution risponde `not_initialized`. Contratti, rebuild, migrazione legacy,
+fallback, sintassi dei riferimenti e limiti: [GraphRAG e tracciabilità](docs/graphrag.md).
 
 ## 7. Verifica
 
