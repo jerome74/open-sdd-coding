@@ -1,10 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "provider": {
+  "providers": {
     "deepseek": {
-      "options": {
-        "baseURL": "https://api.deepseek.com/v1",
-        "setCacheKey": true
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
+        "baseURL": "https://api.deepseek.com/v1"
+      },
+      "compatibility": {
+        "supportsPromptCacheKey": true
       },
       "models": {
         "deepseek-flash": {
@@ -18,47 +21,73 @@
     },
     "github-copilot": {}
   },
-  "disabled_providers": [],
   "model": "deepseek/deepseek-flash",
-  "plugin": ["@keakon/opencode-dcp@1.2.8", "agent-cache-optimizer@0.6.1"],
+  "plugins": [
+    {
+      "package": "./.opencode/plugins/dcp",
+      "options": {}
+    }
+  ],
   "mcp": {
-    "tavily": {
-      "type": "local",
-      "command": ["npx", "-y", "tavily-mcp"],
-      "enabled": false
-    },
-    "fetch": {
-      "type": "local",
-      "command": ["uvx", "mcp-server-fetch"],
-      "enabled": false
-    },
-    "docs": {
-      "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp"],
-      "enabled": false
-    },
-    "github": {
-      "type": "remote",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "enabled": false,
-      "oauth": false,
-      "headers": {
-        "Authorization": "Bearer {env:GITHUB_TOKEN}"
+    "servers": {
+      "tavily": {
+        "type": "local",
+        "command": ["npx", "-y", "tavily-mcp"],
+        "disabled": true
+      },
+      "fetch": {
+        "type": "local",
+        "command": ["uvx", "mcp-server-fetch"],
+        "disabled": true
+      },
+      "docs": {
+        "type": "local",
+        "command": ["npx", "-y", "@upstash/context7-mcp"],
+        "disabled": true
+      },
+      "github": {
+        "type": "remote",
+        "url": "https://api.githubcopilot.com/mcp/",
+        "disabled": true,
+        "oauth": false,
+        "headers": {
+          "Authorization": "Bearer {env:GITHUB_TOKEN}"
+        }
       }
     }
   },
-  "permission": {
-    "edit": {
-      "raw/**": "deny",
-      "*": "allow"
+  "permissions": [
+    {
+      "action": "edit",
+      "resource": "raw/**",
+      "effect": "deny"
     },
-    "bash": {
-      "git push": "ask",
-      "rm -rf *": "deny",
-      "*": "allow"
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "allow"
     },
-    "webfetch": "allow"
-  },
+    {
+      "action": "bash",
+      "resource": "git push",
+      "effect": "ask"
+    },
+    {
+      "action": "bash",
+      "resource": "rm -rf *",
+      "effect": "deny"
+    },
+    {
+      "action": "bash",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "*",
+      "effect": "allow"
+    }
+  ],
   "instructions": [
     "AGENTS.md"
   ]
