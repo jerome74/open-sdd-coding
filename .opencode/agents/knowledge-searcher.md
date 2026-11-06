@@ -7,7 +7,6 @@ description: >-
   explicitly reports NO_INDEX / NO_MATCH — never fabricates. Degrades cleanly to a plain
   interview when no index exists.
 mode: subagent
-model: deepseek/deepseek-flash
 temperature: 0.1
 permission:
   read: allow

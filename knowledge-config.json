@@ -33,8 +33,8 @@
 
   "extraction_mode": "standard",
   "$comment_extraction_mode": "\"standard\" = graphify default semantic extraction (no --mode flag; graphify 0.9.71 offers only --mode deep). \"deep\" = aggressive INFERRED-edge extraction: more LLM tokens. Token-saving default: standard.",
-  "extraction_backend": "deepseek",
-  "$comment_extraction_backend": "RESOLVED on first run (graphify 0.9.53): backend 'deepseek' is the native OpenAI-compatible DeepSeek backend — env DEEPSEEK_API_KEY (set), base https://api.deepseek.com, default model deepseek-flash (matches the project model matrix). Resolved live with `opencode` + `graphify` installed, as the OTQ required.",
+  "extraction_backend": "host-session",
+  "$comment_extraction_backend": "Informational only. Semantic extraction is done by the host session (Conductor) via the graphify skill, staged with GRAPHIFY_OUT=<stage_dir>/<slug> — no provider, no API key. See /generate-llm-wiki Phase 1.",
   "okf_enrichment": true,
   "deepen": true,
   "deepen_scope": 20,

@@ -5,7 +5,6 @@ description: >-
   issues (via the gh CLI) only upon explicit user confirmation. Invoke for product-level
   requirements authoring.
 mode: subagent
-model: deepseek/deepseek-flash
 temperature: 0.3
 permission:
   read: allow

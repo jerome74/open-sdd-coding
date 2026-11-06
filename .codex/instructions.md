@@ -30,8 +30,10 @@ rules apply. This file translates OpenCode runtime notation only; it does not wa
   bypass those paths. New versions of sources require a separate user-authorized ingestion.
 - git push requires approval. OpenCode rm -rf denial is retained by execpolicy; no policy
   bypass, automatic approval or external publication is authorized by migration itself.
-- Models/provider/auth are inherited from the operator's Codex installation. DeepSeek model IDs,
-  temperatures, context limits and cache flags are not transplanted. OpenCode keeps its backend.
+- Models/provider/auth are inherited from the operator's Codex installation; OpenCode agents no longer
+  pin a model either. Knowledge-pipeline extraction (/generate-llm-wiki Phase 1, `$generate-llm-wiki`)
+  runs in the primary thread through the `graphify` skill with the session model: no provider API key,
+  no `graphify extract --backend`, staged via `GRAPHIFY_OUT=<stage_dir>/<slug>`.
   Do not add providers, connect disabled MCP servers, install models or perform API smoke tests
   without explicit authorization. MCP definitions remain disabled; optional cloud examples in
   shared skills do not authorize any connection.

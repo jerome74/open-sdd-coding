@@ -21,7 +21,6 @@
     },
     "github-copilot": {}
   },
-  "model": "deepseek/deepseek-flash",
   "plugins": [
     {
       "package": "./.opencode/plugins/dcp",

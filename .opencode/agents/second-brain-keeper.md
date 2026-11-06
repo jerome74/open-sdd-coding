@@ -6,7 +6,6 @@ description: >-
   second brain", "regenerate the wiki", "update OKF bundle". Invoked by /generate-llm-wiki for
   phases 1-5.
 mode: subagent
-model: deepseek/deepseek-flash
 permission:
   read: allow
   grep: allow
@@ -99,6 +98,12 @@ Resolve the **extraction set**:
 If the extraction set is empty and the bundle already exists, stop: there is nothing to do.
 
 ## Phase 1 — Extract
+
+> **Conductor-run extraction (no API key).** When the caller reports that extraction was already
+> performed by the Conductor via the `graphify` skill (semantic extraction by the host session,
+> staged under `<stage_dir>/<slug>` with `GRAPHIFY_OUT`), **skip the `graphify extract` commands
+> below**: start from the union + re-cluster + health check on the already-staged graphs. A subagent
+> cannot dispatch the skill's parallel subagents, so the Conductor owns this step.
 
 Unless `mode` is `okf` (Phases 1–2 do not run in that mode), initialize the checkpoint first —
 `last_phase_completed: null` — before launching extraction. This overwrites any residual
@@ -457,7 +462,7 @@ Knowledge pipeline complete:
 | Error | Action |
 |---|---|
 | `graphify` not found | `uv tool install graphifyy` |
-| `extraction_backend` still `OTQ-resolve-with-opencode` | resolve the OTQ in `knowledge-config.json` — pick the backend `graphify extract --help` lists for this environment; do not guess |
+| Extraction not done by the Conductor | stop: Phase 1 is Conductor-run via the `graphify` skill (host session, no API key); never call `graphify extract --backend` |
 | LLM extraction fails | Report the full message; suggest `--no-cluster` or `--code-only` for a structure-only build |
 | `<bundle_root>` empty after export | Verify `<graph_json>` is non-empty, re-run the export; if still empty, report as a bug |
 | `okflint` not found | Fall back to `<okf_validate_script>` (already handled above) |

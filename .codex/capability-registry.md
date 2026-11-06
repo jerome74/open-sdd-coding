@@ -32,7 +32,7 @@ OpenCode keeps its original discovery roots and registry fallback.
 | agent | specification | `.codex/agents/specification.toml` | `.opencode/agents/specification.md` | Generate or update AI-ready specification documents for new or existing functionality — clear, unambiguous, machine-readable, self-contained. Invoke when a standalone spec document is needed outside the /spec-brainstorm discovery flow. |
 | skill | rollback | `.agents/skills/rollback` | `.agents/skills/rollback` | Selectively undo the latest or a specified genuinely tracked skill run, previewing changes and preserving later edits. Use for explicit rollback requests, dry runs, and recovery of interrupted tracked transactions. Refuse automatic rollback of untracked executions; never use repository-wide reset, clean, or commit reverts. |
 
-Models inherit the operator-selected Codex session. DeepSeek and temperatures are not mapped.
+Models inherit the operator-selected Codex session. no model is pinned in OpenCode either.
 Read-only roles require read-only parents or the isolated session adapter. Role TOML does not create a sandbox.
 Workflow entrypoints carry metadata.workflow-entrypoint=true and never bind as artifact producers.
 Skill wiki-semantic-search uses a YAML adapter. GraphRAG documentation links are absent upstream; report the gap.

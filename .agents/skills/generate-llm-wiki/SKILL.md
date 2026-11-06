@@ -26,7 +26,7 @@ and OKF settings. Never hard-code a path that the config already defines.
 **Prerequisite:** `graphify` on the PATH (`uv tool install graphifyy`). If missing, stop and say so.
 
 This command runs as the **primary agent** (the Conductor of the knowledge pipeline). Phase 0 runs
-here; phases 1–5 are delegated to `second-brain-keeper` via the native Codex subagent tools. The OKF rules live in
+here; phases 2–5 are delegated; Phase 1 (extraction) runs here, see below to `second-brain-keeper` via the native Codex subagent tools. The OKF rules live in
 the `okf-open-knowledge-format` and `wiki-to-okf` skills. Do not restate their rules here —
 delegate.
 
@@ -155,7 +155,33 @@ delegate.
 7. If every source root **and** `<derived_root>` are empty and no external source is given: report
    it and stop. Nothing to graph.
 
-## Phases 1–5 — delegate
+## Phase 1 — Conductor-run extraction (host session, no API key)
+
+Semantic extraction is performed by **this session** through the `graphify` skill — never with
+`graphify extract --backend …` and never with a provider API key (`extraction_backend` in the config
+is `host-session`, informational only). A subagent cannot dispatch the skill's parallel subagents, so
+this phase belongs to the Conductor. Run it for every root of the extraction set, **one root at a
+time**, before invoking `second-brain-keeper`:
+
+1. Stage per root, outside the source: `export GRAPHIFY_OUT=<stage_dir>/<stage_slug>` (legacy slug:
+   `raw`→`raw`, `docs/specs`→`spec`; converted root: `document_conversion.stage_slug`). The output of
+   the skill lands there, never inside an immutable root.
+2. Follow the `graphify` skill Steps 1–5 with `INPUT_PATH=<root>`: detect → AST (`code` files) →
+   semantic cache check → chunk → dispatch `general` subagents in one message → merge → build →
+   cluster → label communities. Subagents read the spec at
+   `~/.claude/skills/graphify/references/extraction-spec.md`; give each one `CHUNK_PATH` under the
+   stage dir. Chunk rules: long docs alone; images grouped ≈4 per chunk to bound cost (ask the user
+   first when there are many images; PNG that duplicate `.mmd` figures may be skipped).
+3. **Pass a cache root outside the immutable root** — a relative `GRAPHIFY_OUT` combined with
+   `cache_root='<root>'` writes `<root>/graphify-out/…`. If that happens, move the cache into the
+   stage dir and remove the stray directory with a guarded `shutil.rmtree` (never `rm -rf`).
+4. Single configured root: copy/write the final graph to `<graph_json>`. Several roots: union per the
+   agent's Phase 1 rules (dedupe by `id`, no id prefixes), then `graphify cluster-only`.
+5. Health check (`diagnose_extraction`): `dangling_endpoint_edges` and `missing_endpoint_edges` must
+   be `0`; otherwise stop. Then write checkpoint `1-extract` and tell the agent that extraction is
+   done.
+
+## Phases 2–5 — delegate (Phase 1 above runs first)
 
 Invoke `second-brain-keeper` **via the native Codex subagent tools**, passing the extraction set resolved in
 Phase 0, the mode, and the conversion result. Pass entries, not bare strings:
@@ -171,9 +197,8 @@ Phase 0, the mode, and the conversion result. Pass entries, not bare strings:
 
 It runs:
 
-1. incremental extraction of the extraction set (changed roots plus the converted root when it is
-   included) in the configured `extraction_mode` (`deep` → `--mode deep`, `standard` → no flag) and
-   `--backend <extraction_backend>`, then merge and re-cluster into `<graph_json>`;
+1. *(already done by the Conductor — see "Phase 1 — Conductor-run extraction" below; the agent
+   starts from the union + re-cluster + health check on the staged graphs)*;
 2. Obsidian export into `<bundle_root>`;
 3. OKF conversion of `<bundle_root>` via the `wiki-to-okf` skill;
 4. **deepen** — expansion of the note bodies from their original sources;
