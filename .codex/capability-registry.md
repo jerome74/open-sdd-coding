@@ -32,6 +32,11 @@ OpenCode keeps its original discovery roots and registry fallback.
 | agent | specification | `.codex/agents/specification.toml` | `.opencode/agents/specification.md` | Generate or update AI-ready specification documents for new or existing functionality — clear, unambiguous, machine-readable, self-contained. Invoke when a standalone spec document is needed outside the /spec-brainstorm discovery flow. |
 | skill | rollback | `.agents/skills/rollback` | `.agents/skills/rollback` | Selectively undo the latest or a specified genuinely tracked skill run, previewing changes and preserving later edits. Use for explicit rollback requests, dry runs, and recovery of interrupted tracked transactions. Refuse automatic rollback of untracked executions; never use repository-wide reset, clean, or commit reverts. |
 
+| skill | async-python-patterns | `.agents/skills/async-python-patterns` | `wshobson/agents` | Master Python asyncio, concurrent programming, and async/await patterns for high-performance applications. Use when building async APIs, concurrent systems, or I/O-bound applications requiring non-blocking operations. |
+| skill | python-performance-optimization | `.agents/skills/python-performance-optimization` | `wshobson/agents` | Profile and optimize Python code using cProfile, memory profilers, and performance best practices. Use when debugging slow Python code, optimizing bottlenecks, or improving application performance. |
+| skill | python-testing-patterns | `.agents/skills/python-testing-patterns` | `wshobson/agents` | Implement comprehensive testing strategies with pytest, fixtures, mocking, and test-driven development. Use when writing Python tests, setting up test suites, or implementing testing best practices. |
+| skill | python-type-safety | `.agents/skills/python-type-safety` | `wshobson/agents` | Python type safety with type hints, generics, protocols, and strict type checking. Use when adding type annotations, implementing generic classes, defining structural interfaces, or configuring mypy/pyright. |
+
 Models inherit the operator-selected Codex session. no model is pinned in OpenCode either.
 Read-only roles require read-only parents or the isolated session adapter. Role TOML does not create a sandbox.
 Workflow entrypoints carry metadata.workflow-entrypoint=true and never bind as artifact producers.
