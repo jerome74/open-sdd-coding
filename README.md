@@ -1,309 +1,298 @@
-# OpenCode SDD Framework
+# Agente Personale Telegram
 
-Framework di **Specification-Driven Development (SDD)** per [OpenCode](https://opencode.ai), con
-**DeepSeek** come model provider. È la contro-parte OpenCode di un repo Claude-Code-nativo: gli
-stessi ruoli e lo stesso flusso della pipeline SDD, riespressi con le primitive di OpenCode
-(`.opencode/agents/`, `.opencode/commands/`, `.opencode/skills/`, tool `skill`, delega via Task).
+Agente personale che gira su un telefono Android (S24) sotto Termux e si comanda da Telegram:
+crea ed esegue compiti ricorrenti, risponde a domande libere, cerca sul web, legge e riassume log,
+gestisce utenti e storico. La conferma dell'amministratore serve per le azioni che modificano il
+telefono, non per la ricerca web. È un processo Python unico con database SQLite locale; non
+serve un server esterno.
 
-## 1. Cos'è
+Questa guida spiega installazione, configurazione, avvio e uso quotidiano, incluso l'accesso al bot
+da un altro telefono.
 
-Non è un codebase applicativo: il framework contiene **comandi**, **subagent**, **skill**
-OpenCode e script Python di supporto, con test stdlib per il retrieval GraphRAG e la tracciabilità.
-Questi componenti guidano una pipeline:
+## 1. Prerequisiti
 
-```
-docs/input/*.md            (requisito funzionale)
-  → docs/specs/*.spec.md   (specifiche tecniche)
-  → docs/specs/constitution.md   (principi + checklist ## Roadmap)
-  → deliverable (codice, doc, config, diagrammi, …)
-```
+- **Telefono S24** acceso e connesso a Internet (Wi-Fi o dati). Se il telefono è spento o offline,
+  l'agente non risponde.
+- **Termux** installato da F-Droid.
+- **Termux:API** (app) e il pacchetto CLI `termux-api`: servono per batteria e rete.
+- Il comando **`termux-wake-lock`** (fornito da Termux, pacchetto `termux-tools`): mantiene attivo
+  il processo.
+- **Termux:Boot** (app): serve per l'avvio automatico dopo un riavvio del telefono.
+- **Python 3** in Termux (`pkg install python`).
+- Le **dipendenze Python** elencate in `requirements.txt` (installate nel Setup).
+- Un **bot Telegram** e il suo token (creato con **@BotFather**).
+- Una **chiave API DeepSeek**.
+- Facoltativo: una chiave **Tavily** per la ricerca web.
 
-La costituzione SDD del progetto — **generata da `/init-new-project`** — vive in
-`docs/specs/constitution.md`: quando presente raccoglie mission, principi, tech stack e —
-soprattutto — la `## Roadmap`, unica fonte di verità sullo stato di avanzamento. Le regole di
-processo (Conductor, discovery per ruolo, immutabilità, lingua) stanno in [`AGENTS.md`](AGENTS.md),
-caricato automaticamente da OpenCode. Finché la Costituzione non è stata generata, la roadmap **non è
-inizializzata**.
+## 2. Setup
 
-## 2. Prerequisiti
-
-- [`opencode`](https://opencode.ai) installato e sul PATH.
-- Un provider di modelli già autenticato in OpenCode (es. `github-copilot`) o un provider locale.
-  **Nessuna chiave API dedicata alla knowledge pipeline**: l'estrazione usa il modello della sessione.
-
-## 3. Setup provider (la chiave non va mai versionata)
+Mettere il progetto in `~/agente-personale` (è il percorso predefinito di `APP_DIR`):
 
 ```bash
-opencode auth login   # scegli il provider; salva in ~/.local/share/opencode/auth.json, fuori dal repo
+cd ~
+git clone https://github.com/jerome74/open-sdd-coding.git agente-personale
+cd agente-personale
 ```
 
-- Le credenziali vivono **solo** in ambiente o in `~/.local/share/opencode/auth.json`. **Mai** in un
-  file del repo.
-- `.env.example` è solo un promemoria del nome della variabile. Se crei un `.env`, è già in
-  `.gitignore`.
-- `opencode.json` dichiara i provider opzionali, senza alcun campo segreto. Il modello **non è fissato**:
-  si usa quello selezionato nella sessione (`/models`).
-
-## 4. Il flusso a 5 comandi
-
-```mermaid
-flowchart LR
-  A["/gather-requirements"] --> B["/spec-brainstorm &lt;file&gt;"]
-  B --> C["/init-new-project &lt;root&gt;"]
-  C --> D["/SDD-implement &lt;spec|N|-all&gt;"]
-  D --> E["/micro-spec &lt;descrizione&gt;"]
-  E --> D
-```
-
-| Comando | Input | Output |
-|---|---|---|
-| `/gather-requirements` | un'idea di prodotto (anche una riga) | `docs/input/functional-requirements.md` |
-| `/spec-brainstorm <file>` | il requisito funzionale | `docs/specs/*.spec.md` (+ append alla roadmap se la constitution esiste) |
-| `/init-new-project <root>` | le specifiche | `docs/specs/constitution.md` + `AGENTS.md` |
-| `/SDD-implement <spec\|N\|-all>` | la roadmap | i deliverable, un item per volta (plan → produce → validate → publish) |
-| `/micro-spec <descrizione>` | un bug / una modifica piccola | `docs/specs/patch-<slug>.spec.md` + una voce di roadmap |
-
-`/SDD-implement` è il **Conductor**: gira come agente primario, orchestra, e delega solo il
-checkpoint di structure-governance a `@sdd-governor`. `/micro-spec` delega l'authoring a
-`@micro-spec-author` e carica la skill `sdd-guardrail`, che rifiuta le modifiche chieste in chat
-fuori da un comando e le instrada qui.
-
-### Comandi ausiliari (non fanno parte della pipeline SDD)
-
-| Comando | Input | Output |
-|---|---|---|
-| `/plan [file]` | un file in `engineering/prompt/*.md` | `engineering/plan/<stesso-nome>.md` — piano di implementazione, scritto **solo dopo conferma**; drafting delegato a `@planner` (read-only) |
-| `/prompt-engineering [richiesta]` | una richiesta libera, non strutturata | `engineering/prompt/<slug>.md` — la richiesta riscritta nel framework `tech-plan/the_prompt_engineering.md`, con ogni campo ancorato solo a quanto detto dall'utente |
-
-## 5. Modelli
-
-Nessun modello è fissato in `opencode.json` né nel frontmatter di agenti e comandi: tutti i ruoli
-(primario, comandi, subagent) ereditano il modello della sessione, scelto con `/models`.
-Per fissarne uno basta aggiungere `model: <provider>/<id>` al frontmatter del singolo agente.
-
-**Knowledge pipeline.** L'estrazione semantica la esegue la sessione stessa tramite la skill
-`graphify` (Fase 1 di `/generate-llm-wiki`, gestita dal Conductor); nessun backend `graphify extract`
-e nessuna chiave API. `extraction_backend` in `knowledge-config.json` vale `host-session`.
-
-## 6. Cosa NON è portato dal repo di riferimento
-
-- **Motore di generazione documenti da template aziendale** (`document-generator`, manipolazione
-  OOXML). `sdd-governor` valida qualsiasi artefatto contro la *struttura dichiarata* dalla sua
-  spec/template/convenzione, senza motore di clonazione template.
-- **CI GitHub Actions** (`knowledge-lint.yml`). L'immutabilità di `raw/` qui è garantita **solo**
-  dal blocco `permission.edit` di `opencode.json` (`raw/** → deny`), non da una pipeline CI; lo
-  script `scripts/source_watch.py` (portato) resta però disponibile come pre-flight deterministico
-  del cambio sorgenti.
-
-## 6b. Pipeline della conoscenza (graph-first)
-
-Trasforma le source root (`raw/`, `docs/specs/`) in un grafo della conoscenza e poi in un
-artefatto che è insieme vault Obsidian e bundle **OKF v0.1**.
-
-**Prerequisito:** `graphify` sul PATH — `uv tool install graphifyy` (graphify **0.9.25**). È una
-dipendenza esterna deliberata (costituzione §principio 8).
-
-```
-raw/ + docs/specs/  →  graphify-out/graph.json  →  graphify-out/wiki/  →  index/index.json
-```
-
-| Comando | Cosa fa |
-|---|---|
-| `/generate-llm-wiki [update\|check\|all\|okf\|validate\|query "<q>"\|report]` | Fase 0 (change-detect via `scripts/source_watch.py`) sull'agente primario; fasi 1–5 (extract+merge+cluster → export Obsidian → conversione OKF → deepen → gate di conformità) in `@second-brain-keeper` |
-| `/publish-llm-wiki <name>` | commit di `graphify-out/` + `index/` sul branch `<name>_llm_wiki` e push |
-
-- **Unificazione tra le root:** la Fase 1 non incolla più grafi separati con `merge-graphs` (che
-  prefissa gli id per root): fonde i grafi per **`id` senza prefissi** — stesso concetto in `raw/`
-  e `docs/specs/` → una sola nota. I concetti puri hanno **id deterministici** (slug dell'etichetta:
-  minuscolo, spazi → trattini, nessun prefisso). Se un root con codice (`manifest.json`) è
-  configurato, viene estratto **prima** (ondata AST) e i documenti riusano gli id reali via id-map.
-  Dopo la fusione un **health check** (`diagnose_extraction`) richiede
-  `dangling_endpoint_edges: 0` e `missing_endpoint_edges: 0`, altrimenti ci si ferma e si rifà il
-  root incriminato.
-- Tutti i path e le leve vivono in **`knowledge-config.json`** alla radice — non hard-codarli.
-- **`raw/`** è la source root **immutabile** (anche negata da `opencode.json` `permission.edit`);
-  una nuova versione di una fonte è un nuovo file, mai una sovrascrittura.
-- Il gate OKF è `bash .opencode/skills/okf-open-knowledge-format/scripts/validate.sh graphify-out/wiki`
-  (`okflint` non è richiesto). `/publish-llm-wiki` si ferma se il gate non esce 0.
-- Quando la pipeline è stata eseguita, `@knowledge-searcher` interroga un `index/index.json` reale
-  invece di ritornare `NO_INDEX`.
-- L'estrazione semantica è eseguita dalla sessione (skill `graphify`, `GRAPHIFY_OUT=<stage_dir>/<slug>`);
-  nessun backend LLM esterno da configurare.
-
-## 2. Prerequisiti
-
-- [`opencode`](https://opencode.ai) installato e sul PATH.
-- Un provider di modelli già autenticato in OpenCode (es. `github-copilot`) o un provider locale.
-  **Nessuna chiave API dedicata alla knowledge pipeline**: l'estrazione usa il modello della sessione.
-
-## 3. Setup provider (la chiave non va mai versionata)
+Installare le dipendenze dentro `.deps`, senza venv (vincolo del progetto):
 
 ```bash
-opencode auth login   # scegli il provider; salva in ~/.local/share/opencode/auth.json, fuori dal repo
+pip install --target .deps -r requirements.txt
 ```
 
-- Le credenziali vivono **solo** in ambiente o in `~/.local/share/opencode/auth.json`. **Mai** in un
-  file del repo.
-- `.env.example` è solo un promemoria del nome della variabile. Se crei un `.env`, è già in
-  `.gitignore`.
-- `opencode.json` dichiara i provider opzionali, senza alcun campo segreto. Il modello **non è fissato**:
-  si usa quello selezionato nella sessione (`/models`).
+Se `pip` non è disponibile: `pkg install python` e riprovare.
 
-## 4. Il flusso a 5 comandi
+Struttura minima:
 
-```mermaid
-flowchart LR
-  A["/gather-requirements"] --> B["/spec-brainstorm &lt;file&gt;"]
-  B --> C["/init-new-project &lt;root&gt;"]
-  C --> D["/SDD-implement &lt;spec|N|-all&gt;"]
-  D --> E["/micro-spec &lt;descrizione&gt;"]
-  E --> D
+```text
+agente-personale/
+  src/agente/          codice dell'agente
+  config/              template di configurazione e segreti
+  scripts/boot/        avvio automatico e wake-lock
+  requirements.txt
+  .deps/               dipendenze installate (creata dal comando sopra)
 ```
 
-| Comando | Input | Output |
-|---|---|---|
-| `/gather-requirements` | un'idea di prodotto (anche una riga) | `docs/input/functional-requirements.md` |
-| `/spec-brainstorm <file>` | il requisito funzionale | `docs/specs/*.spec.md` (+ append alla roadmap se la constitution esiste) |
-| `/init-new-project <root>` | le specifiche | `docs/specs/constitution.md` + `AGENTS.md` |
-| `/SDD-implement <spec\|N\|-all>` | la roadmap | i deliverable, un item per volta (plan → produce → validate → publish) |
-| `/micro-spec <descrizione>` | un bug / una modifica piccola | `docs/specs/patch-<slug>.spec.md` + una voce di roadmap |
+## 3. Configurazione
 
-`/SDD-implement` è il **Conductor**: gira come agente primario, orchestra, e delega solo il
-checkpoint di structure-governance a `@sdd-governor`. `/micro-spec` delega l'authoring a
-`@micro-spec-author` e carica la skill `sdd-guardrail`, che rifiuta le modifiche chieste in chat
-fuori da un comando e le instrada qui.
-
-### Comandi ausiliari (non fanno parte della pipeline SDD)
-
-| Comando | Input | Output |
-|---|---|---|
-| `/plan [file]` | un file in `engineering/prompt/*.md` | `engineering/plan/<stesso-nome>.md` — piano di implementazione, scritto **solo dopo conferma**; drafting delegato a `@planner` (read-only) |
-| `/prompt-engineering [richiesta]` | una richiesta libera, non strutturata | `engineering/prompt/<slug>.md` — la richiesta riscritta nel framework `tech-plan/the_prompt_engineering.md`, con ogni campo ancorato solo a quanto detto dall'utente |
-
-## 5. Modelli
-
-Nessun modello è fissato in `opencode.json` né nel frontmatter di agenti e comandi: tutti i ruoli
-(primario, comandi, subagent) ereditano il modello della sessione, scelto con `/models`.
-Per fissarne uno basta aggiungere `model: <provider>/<id>` al frontmatter del singolo agente.
-
-**Knowledge pipeline.** L'estrazione semantica la esegue la sessione stessa tramite la skill
-`graphify` (Fase 1 di `/generate-llm-wiki`, gestita dal Conductor); nessun backend `graphify extract`
-e nessuna chiave API. `extraction_backend` in `knowledge-config.json` vale `host-session`.
-
-## 6. Cosa NON è portato dal repo di riferimento
-
-- **Motore di generazione documenti da template aziendale** (`document-generator`, manipolazione
-  OOXML). `sdd-governor` valida qualsiasi artefatto contro la *struttura dichiarata* dalla sua
-  spec/template/convenzione, senza motore di clonazione template.
-- **CI GitHub Actions** (`knowledge-lint.yml`). L'immutabilità di `raw/` qui è garantita **solo**
-  dal blocco `permission.edit` di `opencode.json` (`raw/** → deny`), non da una pipeline CI; lo
-  script `scripts/source_watch.py` (portato) resta però disponibile come pre-flight deterministico
-  del cambio sorgenti.
-
-## 6b. Pipeline della conoscenza (graph-first)
-
-Trasforma le source root (`raw/`, `docs/specs/`) in un grafo della conoscenza e poi in un
-artefatto che è insieme vault Obsidian e bundle **OKF v0.1**.
-
-**Prerequisito:** `graphify` sul PATH — `uv tool install graphifyy` (graphify **0.9.25**). È una
-dipendenza esterna deliberata (costituzione §principio 8).
-
-```
-raw/ + docs/specs/  →  graphify-out/graph.json  →  graphify-out/wiki/  →  index/index.json
-```
-
-| Comando | Cosa fa |
-|---|---|
-| `/generate-llm-wiki [update\|check\|all\|okf\|validate\|query "<q>"\|report]` | Fase 0 (change-detect via `scripts/source_watch.py`) sull'agente primario; fasi 1–5 (extract+merge+cluster → export Obsidian → conversione OKF → deepen → gate di conformità) in `@second-brain-keeper` |
-| `/publish-llm-wiki <name>` | commit di `graphify-out/` + `index/` sul branch `<name>_llm_wiki` e push |
-
-- **Unificazione tra le root:** la Fase 1 non incolla più grafi separati con `merge-graphs` (che
-  prefissa gli id per root): fonde i grafi per **`id` senza prefissi** — stesso concetto in `raw/`
-  e `docs/specs/` → una sola nota. I concetti puri hanno **id deterministici** (slug dell'etichetta:
-  minuscolo, spazi → trattini, nessun prefisso). Se un root con codice (`manifest.json`) è
-  configurato, viene estratto **prima** (ondata AST) e i documenti riusano gli id reali via id-map.
-  Dopo la fusione un **health check** (`diagnose_extraction`) richiede
-  `dangling_endpoint_edges: 0` e `missing_endpoint_edges: 0`, altrimenti ci si ferma e si rifà il
-  root incriminato.
-- Tutti i path e le leve vivono in **`knowledge-config.json`** alla radice — non hard-codarli.
-- **`raw/`** è la source root **immutabile** (anche negata da `opencode.json` `permission.edit`);
-  una nuova versione di una fonte è un nuovo file, mai una sovrascrittura.
-- Il gate OKF è `bash .opencode/skills/okf-open-knowledge-format/scripts/validate.sh graphify-out/wiki`
-  (`okflint` non è richiesto). `/publish-llm-wiki` si ferma se il gate non esce 0.
-- Quando la pipeline è stata eseguita, `@knowledge-searcher` interroga un `index/index.json` reale
-  invece di ritornare `NO_INDEX`.
-- **Open technical question:** `extraction_backend` in `knowledge-config.json` è
-  `OTQ-resolve-with-opencode` — nel repo di riferimento era `claude-cli`; scegli il backend che
-  `graphify extract --help` elenca per questo ambiente al primo run. Fino ad allora l'estrazione
-  fallisce con un messaggio chiaro.
-
-### Retrieval GraphRAG e analisi SDD
-
-Il retrieval ora combina l'indice semantico esistente con un sidecar LPG versionato, mapping
-espliciti, traversal tipizzato limitato e passaggi citati. Un manifest hash comune sostituisce
-il controllo di freshness basato sui timestamp. Il JSON Graphify originale resta invariato;
-un import legacy senza provenance non abilita automaticamente l'espansione relazionale.
+Creare la directory di configurazione e copiare i template:
 
 ```bash
-python3 scripts/graph_retrieval.py "Quali eccezioni alla regola?" --max-hops 2 --direction both
-python3 scripts/cag_context.py "Quali evidenze disponibili?"
-python3 scripts/traceability.py
-python3 -m unittest discover -s tests -v
+mkdir -p ~/.config/agente
+cp config/config.example.toml ~/.config/agente/config.toml
+cp config/secrets.example.env ~/.config/agente/secrets.env
+chmod 600 ~/.config/agente/config.toml ~/.config/agente/secrets.env
 ```
 
-L'analisi SDD legge solo documenti selezionati e riferimenti espliciti, senza modificare la
-roadmap. Senza constitution risponde `not_initialized`. Contratti, rebuild, migrazione legacy,
-fallback, sintassi dei riferimenti e limiti: [GraphRAG e tracciabilità](docs/graphrag.md).
+I permessi `600` sono obbligatori: l'agente rifiuta file leggibili da altri.
 
-## 7. Verifica
+### 3.1 `config.toml`
 
-Checklist ripetibile sullo scaffold. **V-01 è bloccante**: finché non dà 0, lo scaffold non è
-considerato completo.
+Campi principali:
 
-### Controlli statici
+```toml
+admin_telegram_id = 123456789   # ID Telegram numerico dell'amministratore
+secrets_file = "secrets.env"    # relativo alla directory del config
 
-| ID | Controllo | Metodo | Pass se |
-|---|---|---|---|
-| V-01 | Nessuna chiave API versionata | ricerca ricorsiva di stringhe forma-chiave (`sk-…`, token esadecimali ≥ 32) su tutti i file tracciati | 0 occorrenze |
-| V-02 | `.gitignore` esclude i segreti | lettura `.gitignore` | contiene `.env` e `auth.json` |
-| V-03 | Nessuna dipendenza hard da tooling Claude-only | ricerca di `docs/blueprint`, `document-generator`, `graphify`, `okf`, `.claude/`, `.github/workflows` in `.opencode/**` e `AGENTS.md` | nessun match come **dipendenza operativa** (le semplici menzioni in §6 non contano) |
-| V-04 | Ogni comando risolve i suoi agenti | per ogni `@<agente>` citato nei comandi, verificare `.opencode/agents/<agente>.md` | tutti presenti |
-| V-05 | Discovery per ruolo | `SDD-implement.md` non nomina asset per filename fuori dalla Fase 0 di scan | nessun filename di asset hardcoded |
-| V-06 | `AGENTS.md` completo | presenza delle 7 sezioni (What this project is, Conductor, discovery-by-role, roadmap-as-truth, `raw/` immutability, Language, Capability Registry) | tutte presenti |
-| V-07 | Capability Registry allineato | il registry in `AGENTS.md` elenca 6 agenti + 5 comandi + 1 skill per ruolo | conteggio e ruoli corretti |
-| V-08 | Template byte-identici | `diff` di `docs/templates/template.spec.md` e `template.constitution.md` vs repo di riferimento | identici |
-| V-09 | `opencode.json` conforme | `permission.edit` deny `raw/**`, `instructions` (nessun `model` fissato) | tutti i campi presenti |
-| V-10 | Scheletro directory | esistenza `docs/{input,specs,plan,templates}`, `.opencode/{agents,commands,skills}` | tutte presenti |
-| V-11 | Nessun `CLAUDE.md` | ricerca file `CLAUDE.md` | assente |
-| V-12 | Skill `sdd-guardrail` presente e allineata | esistenza `.opencode/skills/sdd-guardrail/SKILL.md`; sezioni Scope / The guardrail / template 4 campi / skeleton / Append-Only / Error-to-Spec | conforme |
+[deepseek]
+model = "deepseek-flash"        # opzionale, default deepseek-flash
+api_base = "https://api.deepseek.com/v1"
+max_context_tokens = 8000
 
-### Smoke (runtime — richiede `opencode` installato)
+[search]
+provider = "tavily"             # opzionale, default tavily; vuoto = ricerca non configurata
 
-| ID | Controllo | Metodo | Pass se |
-|---|---|---|---|
-| S-01 | Il progetto avvia | provider autenticato, `opencode` nella root | avvio senza errori di config |
-| S-02 | Modello disponibile | `/models` | l'elenco include il modello usato in sessione |
-| S-03 | I 5 comandi visibili | elenco comandi nella TUI | compaiono `gather-requirements`, `spec-brainstorm`, `init-new-project`, `SDD-implement`, `micro-spec` |
-| S-04 | Le skill visibili | descrizione del tool `skill` | include `sdd-guardrail` |
-| S-05 (opzionale, consuma quota) | Flusso minimo | `/gather-requirements` con un'idea di test → `/spec-brainstorm` | vengono creati file sotto `docs/input/` e `docs/specs/` |
+[paths]
+db = "~/.local/share/agente/agente.db"
+logs = "~/.local/share/agente/logs"
+```
 
-## 8. Licenza / uso
+`admin_telegram_id` è l'unico amministratore: non si cambia da chat, solo modificando questo file e
+riavviando l'agente. Per conoscere il proprio ID numerico si può usare un bot Telegram che lo mostra
+(ad esempio `@userinfobot`).
 
-Progetto a uso personale. Nessuna licenza specifica.
+`secrets_file` è opzionale: se lo si omette, i segreti vengono letti dalle variabili d'ambiente
+`TELEGRAM_TOKEN`, `DEEPSEEK_API_KEY`, `SEARCH_API_KEY`.
 
-## 9. Known open items
+### 3.2 `secrets.env`
 
-Punti che si chiudono solo con un `opencode` installato; per ciascuno è già adottato un default e
-documentato il fallback.
+```dotenv
+TELEGRAM_TOKEN=123456:token-del-bot
+DEEPSEEK_API_KEY=chiave-deepseek
+SEARCH_API_KEY=chiave-tavily
+```
 
-| # | Domanda aperta | Default adottato | Fallback |
-|---|---|---|---|
-| 2 | `permission.edit` supporta glob per-path (`raw/**` deny)? | forma `{ "raw/**": "deny", "*": "allow" }` in `opencode.json` | qualunque forma equivalente che renda `raw/**` non scrivibile |
-| 3 | `micro-spec-author` può limitare `edit` a `docs/specs/patch-*.spec.md` + `constitution.md`? | vincolo dichiarato nel frontmatter | vincolo solo testuale nel corpo dell'agente (come nel repo di riferimento) |
-| 4 | Il runtime espone il frontmatter degli asset a `/SDD-implement` Fase 0? | scan diretto di `.opencode/**` | sezione **Capability Registry** in `AGENTS.md` (per ruolo) |
-| 5 | `argument-hint` è un campo valido nel frontmatter comando? | mantenuto (innocuo se ignorato) | resta solo `description` |
-| 7 | Il tool `skill` inietta il corpo integrale di `SKILL.md`? | corpo scritto come regole dichiarative autoconsistenti | nessuno necessario |
-| 8 | `AGENTS.md` è ricaricato durante la sessione dopo `/init-new-project`? | assunto sì | riavviare la sessione OpenCode |
+- `TELEGRAM_TOKEN`: token rilasciato da **@BotFather** creando un nuovo bot.
+- `DEEPSEEK_API_KEY`: chiave dell'account DeepSeek.
+- `SEARCH_API_KEY`: facoltativa; serve alla ricerca web. Se manca, la ricerca risponde con un
+  errore esplicito. `search.provider` è `tavily` per default.
 
-Le verifiche smoke S-01…S-05 sono **differite**: non erano eseguibili al momento della generazione
-dello scaffold (nessun `opencode` disponibile). Eseguile al primo avvio.
+Il token del bot è una password: non va condiviso, non va messo nel repository e non va inviato in
+chat. Se viene esposto, revocarlo da BotFather e generarne uno nuovo.
+
+## 4. Avvio
+
+### 4.1 Avvio manuale
+
+Dalla **radice del progetto** (la directory che contiene `src/` e `.deps/`):
+
+```bash
+cd ~/agente-personale
+PYTHONPATH=src:.deps python3 -m agente --config ~/.config/agente/config.toml
+```
+
+L'entrypoint è `src/agente/__main__.py`. Il processo resta in primo piano; `Ctrl+C` lo ferma.
+All'avvio l'agente migra il database, carica i job e recupera i compiti saltati; se esiste un avvio
+precedente, invia all'amministratore il messaggio di ripartenza con il periodo di assenza. Ogni
+giorno all'orario `liveness_at` (default `08:00`) invia un segnale di vita; se il telefono era
+offline, il segnale mancato è riportato alla ripartenza successiva.
+
+### 4.2 Avvio automatico (Termux:Boot)
+
+1. Installare **Termux:Boot** e aprirlo una volta.
+2. Copiare **entrambi** gli script nella directory di boot:
+
+```bash
+mkdir -p ~/.termux/boot
+cp ~/agente-personale/scripts/boot/90-agent.sh ~/.termux/boot/
+cp ~/agente-personale/scripts/boot/start-agent.sh ~/.termux/boot/
+chmod 700 ~/.termux/boot/90-agent.sh
+chmod 600 ~/.termux/boot/start-agent.sh
+```
+
+Se il progetto non è in `~/agente-personale`, sostituire il percorso nei due `cp` con quello reale
+e impostare `APP_DIR` come allo step 4.
+
+Termux:Boot esegue **ogni** file eseguibile della directory: solo `90-agent.sh` deve avere il bit
+eseguibile, altrimenti partirebbero due supervisori e due processi in polling sullo stesso bot.
+
+3. Modificare il `90-agent.sh` **copiato** in `~/.termux/boot/`: la riga di invocazione deve usare
+   `bash`, perché `start-agent.sh` non è eseguibile:
+
+```bash
+# dentro ~/.termux/boot/90-agent.sh
+bash "$SCRIPT_DIR/start-agent.sh" >/dev/null 2>&1 &
+disown
+```
+
+4. Se il progetto non è in `~/agente-personale`, impostare `APP_DIR` nel `start-agent.sh` copiato:
+
+```bash
+APP_DIR="$HOME/percorso/reale"
+```
+
+In Termux:Boot non arriva l'ambiente della shell: la modifica va fatta nello script copiato (o con
+un `export` dentro `90-agent.sh`). `start-agent.sh` acquisisce il wake-lock e rilancia l'agente se
+termina.
+
+### 4.3 Log
+
+- **Applicativo:** `agente.jsonl` nella directory `[paths].logs` (default
+  `~/.local/share/agente/logs`). Una riga JSON per evento, rotazione a 2 000 000 byte per file con 5
+  backup (circa 12 MB).
+- **Supervisore:** `$LOG_DIR/supervisor.log` (default `~/.local/share/agente/logs`), in append senza
+  rotazione: contiene i riavvii e il codice di uscita del processo.
+
+`LOG_DIR` e `[paths].logs` sono indipendenti: se si cambia `[paths].logs`, impostare `LOG_DIR` nello
+stesso modo (`APP_DIR`/`LOG_DIR` nello `start-agent.sh` copiato o `export` in `90-agent.sh`),
+altrimenti i due log finiscono in directory diverse.
+
+```bash
+tail -f ~/.local/share/agente/logs/agente.jsonl
+tail -f ~/.local/share/agente/logs/supervisor.log
+```
+
+## 5. Comandi (uso da Telegram)
+
+I comandi si inviano al bot come normali messaggi. `@NomeBot` dopo il comando è accettato.
+
+| Comando | Ruolo | Cosa fa |
+|---|---|---|
+| `/help`, `/start` | ogni ruolo riconosciuto | mostra l'elenco dei comandi |
+| `/tasks` | admin e autorizzati | elenca i compiti visibili al ruolo |
+| `/run <nome>` | admin su qualsiasi compito; autorizzato solo se iscritto e attivo | esegue subito un compito |
+| `/reset` | admin e autorizzati | azzera la propria conversazione |
+| `/pause <nome>` | solo admin | sospende un compito |
+| `/resume <nome>` | solo admin | riattiva un compito |
+| `/delete <nome>` | solo admin | elimina un compito |
+| `/rename <nome> <nuovo nome>` | solo admin | rinomina un compito |
+| `/history [periodo] [compito]` | admin e autorizzati | storico delle esecuzioni visibili al ruolo |
+| `/chat <telegram_id>` | solo admin | rilegge la chat di un utente |
+| `/adduser <telegram_id> [username]` | solo admin | avvia l'autorizzazione e invia l'informativa privacy |
+| `/removeuser <telegram_id>` | solo admin | revoca un utente |
+| `/users` | solo admin | elenca utenti e compiti |
+| `/subscribe <compito> <telegram_id>` | solo admin | iscrive un utente che ha accettato l'informativa |
+| `/unsubscribe <compito> <telegram_id>` | solo admin | disiscrive un utente |
+
+### 5.1 Creare un compito in linguaggio naturale
+
+Non serve un comando: si scrive cosa deve fare e quando. Esempi:
+
+- «Ogni giorno alle 8 riassumi le notizie sull'IA e mandamele.»
+- «Ogni lunedì alle 9 leggimi `/sdcard/logs/app.log` e segnalami gli errori.»
+- «Ogni 30 minuti controlla il sito e avvisami se cambia.»
+
+Solo l'amministratore può creare compiti: un utente autorizzato che ci prova riceve un rifiuto.
+L'agente mostra un riepilogo e chiede conferma; il compito viene salvato solo dopo la conferma.
+Per eseguirlo subito: «lancia <nome>» oppure `/run <nome>`.
+
+### 5.2 Leggere e riassumere i log
+
+La lettura dei log non è un comando dedicato: è una capacità di un **compito**. Nel testo si
+indica il percorso **assoluto** del file (o della cartella) e l'agente lo usa come allowlist di
+lettura; i percorsi relativi vengono scartati. Esempio:
+
+> «Ogni giorno alle 7 leggi `/sdcard/logs/app.log` e riassumi gli errori delle ultime 24 ore.»
+
+La lettura è limitata ai percorsi indicati nel compito: lo strumento `read_logs` applica
+l'allowlist del compito. Le azioni modificanti sul telefono passano invece dal gate di conferma
+dell'amministratore.
+
+## 6. Accesso da un altro telefono
+
+Il bot non è un'app da installare: è un **bot Telegram**. Si usa da qualsiasi telefono o computer su
+cui sia installato Telegram.
+
+### Stesso account (stessi permessi)
+
+Se sul secondo telefono si accede a Telegram con lo **stesso account** dell'amministratore, il
+`telegram_id` è lo stesso: il bot riconosce l'amministratore e tutti i comandi funzionano come sul
+telefono principale. Non serve configurare nulla, non serve un secondo bot e non serve un secondo
+server. Le chat sono sincronizzate da Telegram.
+
+### Account diverso (utente autorizzato)
+
+Un'altra persona, con un altro account, deve essere autorizzata dall'amministratore:
+
+1. L'utente deve aver **avviato il bot almeno una volta**: Telegram non permette al bot di
+   scrivere per primo.
+2. L'amministratore invia `/adduser <telegram_id> [username]`.
+3. L'utente riceve l'informativa privacy con i pulsanti **Accetto** / **Rifiuto**.
+4. Dopo **Accetto** può usare il bot: chat, `/tasks`, `/history`, `/run` sui compiti a cui è
+   iscritto e i risultati dei compiti sottoscritti.
+5. `/removeuser <telegram_id>` revoca l'accesso.
+
+Un utente non autorizzato riceve il rifiuto «Non sei autorizzato a usare questo agente» e nessun
+comando viene eseguito; l'amministratore riceve un avviso, al massimo uno ogni 24 ore per lo stesso
+utente all'interno dello stesso processo (un riavvio può produrne uno in più). L'autorizzazione e la
+revoca sono riservate all'amministratore.
+
+### Cosa ricordare
+
+- L'agente gira **solo sull'S24**: l'altro telefono è un client. Se l'S24 è spento o offline, il bot
+  non risponde.
+- Non serve esporre porte, installare un server o creare un secondo bot.
+- Non condividere il token: chi lo possiede può controllare il bot.
+- L'amministratore è solo quello indicato in `admin_telegram_id`; per cambiarlo si modifica il file
+  di configurazione e si riavvia l'agente.
+
+## 7. Sicurezza
+
+- Token del bot e chiavi API vivono solo in `secrets.env` (permessi `600`) o nell'ambiente. Mai nel
+  repository, mai in chat.
+- Anche `config.toml` deve avere permessi `600`.
+- L'amministratore è definito solo dalla configurazione, non da un comando Telegram.
+- I log applicativi non contengono segreti: i campi sensibili sono oscurati.
+- Database e log restano sul telefono. I messaggi transitano dai server di DeepSeek (per generare
+  le risposte) e di Telegram (per il trasporto), come indicato nell'informativa privacy.
+- Il bot legge solo i percorsi indicati nei compiti (allowlist); non esegue azioni modificanti senza
+  la conferma dell'amministratore.
+
+## 8. Troubleshooting essenziale
+
+| Sintomo | Causa probabile | Rimedio |
+|---|---|---|
+| `ConfigError: limite non valido` o file mancante | `config.toml` assente o incompleto | copiare il template e compilare i campi obbligatori |
+| `ConfigError` sui permessi | `config.toml` o `secrets.env` leggibili da altri | `chmod 600` su entrambi |
+| `ConfigError` sui segreti | token o chiave assenti | compilare `secrets.env` o esportare le variabili |
+| `ModuleNotFoundError` | dipendenze non installate o `PYTHONPATH` errato | `pip install --target .deps -r requirements.txt`, avviare dalla radice con `PYTHONPATH=src:.deps` |
+| Il bot non risponde | processo fermo, token errato o telefono offline | controllare `agente.jsonl` e `supervisor.log`, verificare rete e token |
+| `Non sei autorizzato a usare questo agente` | utente non autorizzato o revocato | `/adduser` dall'amministratore e consenso privacy |
+| Avvio automatico muto | `90-agent.sh` copiato non modificato: invoca direttamente un file `600` e l'output va in `/dev/null` | applicare la modifica con `bash "$SCRIPT_DIR/start-agent.sh"` |
+| Due processi / conflitto polling | `start-agent.sh` eseguibile in `~/.termux/boot/` | `chmod 600 ~/.termux/boot/start-agent.sh`, lasciare eseguibile solo `90-agent.sh` |
+| Boot non trova il progetto | `APP_DIR` errato | correggere `APP_DIR=` nello `start-agent.sh` copiato |
+| Avvio manuale fallito | non si è nella radice del progetto | `cd ~/agente-personale` e riprovare |
+| Ricerca web non disponibile | `search.provider` vuoto o chiave assente | impostare `provider` e `SEARCH_API_KEY` |
+| L'avvio automatico non parte | Termux:Boot non installato o non aperto | installare Termux:Boot e aprirlo una volta |
+| Il boot non esegue lo script | `90-agent.sh` senza bit eseguibile | `chmod 700 ~/.termux/boot/90-agent.sh` |
+| Serve vedere l'errore del boot | l'output è rediretto in `/dev/null` | provare a mano `bash ~/.termux/boot/start-agent.sh` |

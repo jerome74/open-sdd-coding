@@ -1,6 +1,6 @@
-# AGENTS.md — OpenCode SDD Framework (DeepSeek)
+# AGENTS.md — Agente Personale Telegram (OpenCode SDD, DeepSeek)
 
-Nucleo minimo delle regole di processo, caricato a ogni richiesta: tutto il resto si legge **solo quando serve**.
+Nucleo minimo di processo, caricato a ogni richiesta: il resto si legge **solo quando serve**.
 
 ## 0. Fonti
 - **Costituzione SDD** `docs/specs/constitution.md` — Mission, principi non negoziabili, Tech Stack, `## Roadmap`. **Non** è auto-caricata: leggila prima di lavoro SDD o in caso di dubbio su *cosa* costruire (vince lei). Assente → roadmap non inizializzata: `/init-new-project`.
@@ -9,7 +9,7 @@ Nucleo minimo delle regole di processo, caricato a ogni richiesta: tutto il rest
 - **Knowledge base** — prima di rispondere su contenuti di progetto consulta `python3 scripts/cag_context.py "<q>"` e **cita le note**; nessun risultato → dichiaralo, non inventare; non leggere `raw/` come fonte di risposta (FR-011, BR-1).
 
 ## 1. Regole generali
-Pensa prima di agire (requisito non documentato → fermati e segnala) · YAGNI · modifiche chirurgiche · ogni lavoro tracciato da una voce di `## Roadmap` o da una Micro-Spec (`/micro-spec`).
+Pensa prima di agire (requisito non documentato → fermati e segnala) · YAGNI · modifiche chirurgiche · ogni lavoro tracciato da una voce di `## Roadmap` o da una Micro-Spec (`/micro-spec`). Leggi la spec della feature prima di implementare; non inventare requisiti, soglie, versioni o provider.
 
 ## 2. Stile di output — caveman mode
 Risposte in chat **telegrafiche**: niente articoli, riempitivi, cautele, preamboli né narrazione dei passi; frammenti OK; termini tecnici esatti.
@@ -23,12 +23,19 @@ Risposte in chat **telegrafiche**: niente articoli, riempitivi, cautele, preambo
 - **`## Roadmap` = unica fonte di stato** — ordine e `- [ ]`/`- [x]`; si spunta solo a ciclo Plan → Produce → Validate → Publish completo. Mai stato altrove, mai roadmap inventate.
 - **Una voce per contesto** — tra una voce e la successiva: `/compact` o nuova sessione; alla ripresa si rilegge la `## Roadmap`.
 
-## 4. `raw/` immutabile
+## 4. Vincoli di progetto
+- Python 3, processo singolo Termux/S24 senza root; componenti in-process C-01…C-13.
+- Confini: Telegram C-03, DeepSeek C-05, SQLite C-02, filesystem/comandi C-07, strumenti C-08; modifiche solo via gate C-27/C-28 + approvazione admin.
+- Sicurezza: admin solo da config; segreti `600`, mai in git/log; dati solo su S24; log solo da allowlist; consenso privacy.
+- Soglie/versioni: vedi `constitution.md`; versioni non dichiarate → non inventarle.
+- Type hints, config tipizzata, errori espliciti; italiano default, timezone telefono.
+
+## 5. `raw/` immutabile
 Mai modificare, rinominare, spostare o cancellare sotto `raw/`: solo aggiungere (nuova versione = nuovo file). Imposto da `opencode.json` `permission.edit`.
 
-## 5. Lingua
+## 6. Lingua
 `README.md`, spec e `constitution.md` in **italiano**; commands, agents, skills in **inglese**; `/gather-requirements`, `/spec-brainstorm`, `/micro-spec` nella lingua dell'utente (default italiano). Altrimenti segui la lingua del file.
 
-## 6. RTK e lifecycle
+## 7. RTK e lifecycle
 - Il plugin `.opencode/plugins/rtk.ts` riscrive i comandi shell in `rtk …`; senza `rtk` nel PATH lascia passare il comando invariato. Misura: `rtk gain -p`.
 - `/init-new-project` può riscrivere questo file: deve restare un nucleo minimo. Dopo modifiche, riapri la sessione.

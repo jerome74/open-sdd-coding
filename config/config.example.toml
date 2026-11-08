@@ -1,0 +1,36 @@
+# Configurazione dell'Agente Personale Telegram (spec 01, C-01).
+# Copiare in ~/.config/agente/config.toml e impostare chmod 600.
+# I segreti NON stanno qui: vedi secrets_file / variabili d'ambiente.
+
+admin_telegram_id = 123456789
+secrets_file = "secrets.env"
+
+[deepseek]
+model = "deepseek-flash"
+api_base = "https://api.deepseek.com/v1"
+max_context_tokens = 8000
+
+[search]
+# Provider di ricerca (spec 06 D2): default "tavily". Valori ammessi oggi: "tavily".
+# Vuoto o non supportato = web_search risponde con un errore esplicito.
+# La chiave si mette in secrets.env come SEARCH_API_KEY.
+provider = "tavily"
+
+[paths]
+db = "~/.local/share/agente/agente.db"
+logs = "~/.local/share/agente/logs"
+
+[limits]
+execution_timeout_s = 600        # 10 minuti (BR-4)
+retry_attempts = 3               # BR-8
+retry_delay_s = 60               # BR-8
+approval_timeout_s = 900         # 15 minuti (BR-3)
+history_retention_days = 30      # BR-7
+chat_memory_hours = 24           # BR-6
+battery_threshold_pct = 15       # BR-9
+offline_threshold_s = 3600       # 1 ora (BR-10)
+liveness_at = "08:00"            # BR-11
+min_interval_minutes = 1         # spec 02 D2: intervallo minimo di un compito
+connectivity_check_s = 60        # spec 03 D4: verifica stato rete (recupero BR-5)
+battery_check_s = 300            # spec 10 D2: lettura batteria ogni 5 minuti
+chat_progress_s = 2              # spec 05 D5: soglia di «sto cercando…»

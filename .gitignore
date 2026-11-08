@@ -2,10 +2,15 @@
 .env
 *.local
 auth.json
+token.sh
+config/secrets*.env
+!config/secrets.example.env
 
 # Python
 __pycache__/
 *.pyc
+.venv/
+.deps/
 
 # OS / editor cruft
 .DS_Store
