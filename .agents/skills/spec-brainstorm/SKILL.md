@@ -61,7 +61,7 @@ Propose incremental, independently deliverable, testable features (ID + slug). P
 - `docs/specs/{id}-{feature-name}.spec.md`, `{id}` sequential (01, 02, …), kebab-case slug, base template `docs/templates/template.spec.md`.
 - `New` → new file, next unused `{id}`. `Modifies` → edit that file **in place** (same `{id}`/filename), untouched sections verbatim, a history note on what changed and why.
 - Mandatory sections: Functional Context · Architecture Overview · Component Design · Domain Model · Data Model · Data Flows · Integration Design · Security Requirements · Non-Functional Requirements · Risks and Assumptions · Open Technical Questions · Acceptance Criteria · Documentation Sources · Assumptions · Outstanding Questions · Confidence Assessment (High/Medium/Low/Unknown + one-line rationale; documented beats inferred).
-- Implementation-oriented, each independently implementable, Italian, identifiers exact. Never fill a section with fabricated content.
+- Implementation-oriented, each independently implementable, English, identifiers exact. Never fill a section with fabricated content.
 
 ## Roadmap update
 

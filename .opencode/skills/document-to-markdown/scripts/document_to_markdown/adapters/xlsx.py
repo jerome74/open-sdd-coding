@@ -41,9 +41,9 @@ def _parse(archive: zipfile.ZipFile, name: str) -> ET.Element:
     try:
         return ET.fromstring(archive.read(name))
     except KeyError as exc:
-        raise ConversionError(f"parte mancante nel file Excel: '{name}'", code="CORRUPT") from exc
+        raise ConversionError(f"missing part in the Excel file: '{name}'", code="CORRUPT") from exc
     except ET.ParseError as exc:
-        raise ConversionError(f"XML non valido in '{name}': {exc}", code="CORRUPT") from exc
+        raise ConversionError(f"invalid XML in '{name}': {exc}", code="CORRUPT") from exc
 
 
 def _relationships(archive: zipfile.ZipFile) -> dict[str, str]:
@@ -73,11 +73,11 @@ def _sheet_definitions(archive: zipfile.ZipFile) -> list[tuple[str, str]]:
     if container is None:
         return sheets
     for sheet in container.findall(f"{M}sheet"):
-        name = sheet.get("name") or "Foglio"
+        name = sheet.get("name") or "Sheet"
         identifier = sheet.get(f"{{{OFFICE_REL}}}id")
         target = relationships.get(identifier or "")
         if target is None:
-            raise ConversionError(f"foglio '{name}' senza relazione nel workbook", code="CORRUPT")
+            raise ConversionError(f"sheet '{name}' has no relationship in the workbook", code="CORRUPT")
         sheets.append((name, target))
     return sheets
 
@@ -163,13 +163,13 @@ class XlsxAdapter(Adapter):
         try:
             archive = zipfile.ZipFile(source)
         except (zipfile.BadZipFile, OSError) as exc:
-            raise ConversionError(f"file Excel non valido '{source}': {exc}", code="CORRUPT") from exc
+            raise ConversionError(f"invalid Excel file '{source}': {exc}", code="CORRUPT") from exc
 
         with archive:
             names = set(archive.namelist())
             if "xl/workbook.xml" not in names:
                 raise ConversionError(
-                    f"file Excel non valido '{source}': manca 'xl/workbook.xml'",
+                    f"invalid Excel file '{source}': 'xl/workbook.xml' is missing",
                     code="CORRUPT",
                 )
             shared = _shared_strings(archive)
@@ -180,14 +180,14 @@ class XlsxAdapter(Adapter):
             for sheet_name, target in sheets:
                 rows, merges = _sheet_rows(archive, target, shared)
                 sections.append(f"## {sheet_name}")
-                table = render_table(rows) if rows else "_(foglio vuoto)_"
+                table = render_table(rows) if rows else "_(empty sheet)_"
                 sections.append(table)
                 if merges:
-                    sections.append("Celle unite: " + ", ".join(merges))
+                    sections.append("Merged cells: " + ", ".join(merges))
                 sections.append("")
 
             if images:
-                sections.append("## Immagini")
+                sections.append("## Images")
                 for image in images:
                     sections.append(f"![{image}]({media_dir.name}/{image})")
                 sections.append("")

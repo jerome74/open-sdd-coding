@@ -141,7 +141,7 @@ cached formula values are shown only when the workbook contains them.
       "tool": "pandoc",
       "source_sha256": null,
       "converted_sha256": null,
-      "error": "CORRUPT: pandoc non ha prodotto …"
+      "error": "CORRUPT: pandoc produced no …"
     }
   }
 }
@@ -183,7 +183,7 @@ Per-document error prefixes stored in the map and printed on stderr:
 | `MAP` | Existing conversion map is invalid; the run starts from a new map. |
 | `IO_ERROR` / `INTERNAL` | Unexpected filesystem or engine failure. |
 
-Messages are in Italian and include the exact path and cause. Logs go to
+Messages are in English and include the exact path and cause. Logs go to
 stderr; `--json` payload goes to stdout.
 
 ## Safety guarantees

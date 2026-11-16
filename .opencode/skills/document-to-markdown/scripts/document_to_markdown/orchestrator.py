@@ -46,7 +46,7 @@ class RunLock:
             descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
         except FileExistsError as exc:
             raise PathError(
-                f"run già in corso per '{self.path.parent}': rimuovere '{self.path}' se non è attivo"
+                f"run already in progress for '{self.path.parent}': remove '{self.path}' if it is not active"
             ) from exc
         os.close(descriptor)
         self._held = True
@@ -77,7 +77,7 @@ class Orchestrator:
         resolved = [resolve_path(root) for root in roots]
         for root in resolved:
             if not root.is_dir():
-                raise PathError(f"root di input non trovato o non è una directory: '{root}'")
+                raise PathError(f"input root not found or not a directory: '{root}'")
         validate_out_dir(self.config, resolved)
 
         slugs: list[str] = []
@@ -102,7 +102,7 @@ class Orchestrator:
             try:
                 data = load_map(map_path, root.name)
             except ConversionError as exc:
-                self.log(f"attenzione: {exc}; nuova mappa")
+                self.log(f"warning: {exc}; new map")
                 data = new_map(root.name)
 
             entries = data.setdefault("entries", {})
@@ -122,10 +122,10 @@ class Orchestrator:
 
                 adapter = self.registry.get(source)
                 if adapter is None:
-                    message = f"UNSUPPORTED: formato non supportato: '{source.suffix.lower()}'"
+                    message = f"UNSUPPORTED: unsupported format: '{source.suffix.lower()}'"
                     entries[rel] = make_entry(status="error", error=message)
                     report.add_error(root, rel, message)
-                    self.log(f"errore: {rel}: {message}")
+                    self.log(f"error: {rel}: {message}")
                     continue
 
                 try:
@@ -134,24 +134,24 @@ class Orchestrator:
                     message = str(exc)
                     entries[rel] = make_entry(status="error", tool=adapter.name, error=message)
                     report.add_error(root, rel, message)
-                    self.log(f"errore: {rel}: {message}")
+                    self.log(f"error: {rel}: {message}")
                     continue
                 except OSError as exc:
                     message = f"IO_ERROR: {exc}"
                     entries[rel] = make_entry(status="error", tool=adapter.name, error=message)
                     report.add_error(root, rel, message)
-                    self.log(f"errore: {rel}: {message}")
+                    self.log(f"error: {rel}: {message}")
                     continue
                 except Exception as exc:
                     message = f"INTERNAL: {type(exc).__name__}: {exc}"
                     entries[rel] = make_entry(status="error", tool=adapter.name, error=message)
                     report.add_error(root, rel, message)
-                    self.log(f"errore: {rel}: {message}")
+                    self.log(f"error: {rel}: {message}")
                     continue
 
                 entries[rel] = entry
                 report.count("converted")
-                self.log(f"convertito: {rel} -> {entry['converted']}")
+                self.log(f"converted: {rel} -> {entry['converted']}")
 
             data["root"] = root.name
             write_map_atomic(map_path, data)
@@ -174,15 +174,15 @@ class Orchestrator:
             staged_md = staging / Path(md_rel).name
             staged_media = staging / Path(media_rel).name
             ensure_within(staged_md, staging, label="output markdown")
-            ensure_within(staged_media, staging, label="directory media")
+            ensure_within(staged_media, staging, label="media directory")
 
             result = adapter.convert(source, staged_md, staged_media, self.config)
-            ensure_within(result.converted, staging, label="output convertito")
+            ensure_within(result.converted, staging, label="converted output")
             if result.media is not None:
-                ensure_within(result.media, staging, label="media convertiti")
+                ensure_within(result.media, staging, label="converted media")
             if not result.converted.is_file():
                 raise ConversionError(
-                    f"l'adapter '{adapter.name}' non ha prodotto '{result.converted}'",
+                    f"adapter '{adapter.name}' produced no '{result.converted}'",
                     code="INTERNAL",
                 )
 

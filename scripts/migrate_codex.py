@@ -223,10 +223,10 @@ def generate(root: Path = ROOT) -> dict:
         if name == 'wiki-semantic-search':
             outputs[destination + '/SKILL.md'] = ('---\nname: ' + name + '\ndescription: ' + json.dumps(meta['description']) + '\n---\n\n' + body)
             symlinks[destination + '/scripts'] = '../../../.opencode/skills/' + name + '/scripts'
-            strategy, compatibility = 'YAML adapter; scripts symlink', 'parziale (YAML originale invalido)'
+            strategy, compatibility = 'YAML adapter; scripts symlink', 'partial (original YAML invalid)'
         else:
             symlinks[destination] = '../../.opencode/skills/' + folder.name
-            strategy, compatibility = 'symlink', 'equivalente; dipendenze originali'
+            strategy, compatibility = 'symlink', 'equivalent; original dependencies'
         rows.append(dict(source=folder.relative_to(root).as_posix(), kind='skill', target=destination,
                          name=name, description=meta['description'], strategy=strategy, compatibility=compatibility))
     command_sources = sorted((root / '.opencode/commands').glob('*.md'))
@@ -297,7 +297,7 @@ stop; do not delete anything inside an immutable root. Root AGENTS.md forbids su
             + json.dumps(meta['description']) + '\nmetadata:\n  workflow-entrypoint: "true"\n---\n\n' + prefix + converted)
         rows.append(dict(source=path.relative_to(root).as_posix(), kind='command', name=name, description=meta['description'],
                          target=f'.agents/skills/{name}/SKILL.md', strategy='workflow skill + argv adapter',
-                         compatibility='parziale (invocazione e tool adattati)'))
+                         compatibility='partial (invocation and tools adapted)'))
     for path in agent_sources:
         meta, body = split_source(path)
         name = path.stem
@@ -314,7 +314,7 @@ stop; do not delete anything inside an immutable root. Root AGENTS.md forbids su
         outputs[f'.codex/agents/{name}.toml'] = '\n'.join(key + ' = ' + json.dumps(value, ensure_ascii=False) for key, value in data.items()) + '\n\n[features]\napps = false\nplugins = false\n' + ('shell_tool = false\n' if name in NO_SHELL else '')
         rows.append(dict(source=path.relative_to(root).as_posix(), kind='agent', name=name, description=meta['description'],
                          target=f'.codex/agents/{name}.toml', strategy='native standalone TOML + session adapter',
-                         compatibility='parziale (permessi e modello)'))
+                         compatibility='partial (permissions and model)'))
     # Independently authored Codex skills are registered, never generated or overwritten.
     local_root = root / '.agents/skills'
     known_names = {row['name'] for row in rows}
@@ -328,7 +328,7 @@ stop; do not delete anything inside an immutable root. Root AGENTS.md forbids su
                 continue
             rows.append(dict(source=folder.relative_to(root).as_posix(), kind='skill', name=meta['name'],
                              description=meta['description'], target=folder.relative_to(root).as_posix(),
-                             strategy='independent Codex skill; preserve original files', compatibility='nativa'))
+                             strategy='independent Codex skill; preserve original files', compatibility='native'))
             known_names.add(meta['name'])
     outputs['.codex/config.toml'] = CONFIG
     outputs['.codex/instructions.md'] = INSTRUCTIONS

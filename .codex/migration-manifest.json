@@ -1,7 +1,7 @@
 {
   "inventory": [
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Convert local Word, PowerPoint, Excel, and PDF documents to Markdown plus extracted media. Use when asked to convert documents to Markdown, extract text/tables from .docx/.pptx/.xlsx/.pdf, prepare binary documents for reading or search, or handle legacy .doc/.ppt/.xls files. Local-only engine; no network, no LLM, no Python dependencies.",
       "kind": "skill",
       "name": "document-to-markdown",
@@ -10,7 +10,7 @@
       "target": ".agents/skills/document-to-markdown"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Always use when user asks to create, generate, draw, or design a diagram, flowchart, architecture diagram, ER diagram, sequence diagram, class diagram, network diagram, mockup, wireframe, or UI sketch, or mentions draw.io, drawio, drawoi, .drawio files, or diagram export to PNG/SVG/PDF.",
       "kind": "skill",
       "name": "drawio",
@@ -19,7 +19,7 @@
       "target": ".agents/skills/drawio"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Retrieve grounded wiki context using semantic search plus explicit entity linking and bounded typed graph traversal. Use for knowledge lookup, relational evidence, exceptions and conflicts during gathering or specification work. Does not build indexes, infer requirement confirmation, or execute arbitrary graph queries.",
       "kind": "skill",
       "name": "graph-retrieval",
@@ -28,7 +28,7 @@
       "target": ".agents/skills/graph-retrieval"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Create, validate, and enrich Open Knowledge Format (OKF) bundles — the open spec for representing organizational knowledge as markdown files with YAML frontmatter. Use when the user mentions 'OKF', 'Open Knowledge Format', 'knowledge bundle', 'OKF bundle', 'create a knowledge base for agents', 'validate OKF', 'convert to OKF', 'enrich knowledge docs', 'agent-readable knowledge', 'LLM wiki', 'knowledge catalog', 'kcmd', or wants to structure knowledge as markdown files for AI agent consumption. Also use when the user has a directory of markdown files and wants to make them interoperable or conformant with the OKF standard. Even for simple requests like 'make this folder OKF conformant' — the skill has critical structural rules the agent needs.",
       "kind": "skill",
       "name": "okf-open-knowledge-format",
@@ -37,7 +37,7 @@
       "target": ".agents/skills/okf-open-knowledge-format"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Fill the Prompt Engineering template (tech-plan/the_prompt_engineering.md) from a user's raw, free-form ask, grounding every filled field only in what the user explicitly said or confirmed — never silently inferring or completing missing parts. Use when structuring a free-form ask into that framework, when asked to 'compile the prompt engineering template', or when the /prompt-engineering command runs.",
       "kind": "skill",
       "name": "prompt-engineering",
@@ -46,7 +46,7 @@
       "target": ".agents/skills/prompt-engineering"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Keeps changes inside Spec-Driven Development — refuses direct code/config edits requested by a plain chat message that is not issued through a command and is not a request for an explanation, and routes them to /micro-spec instead. Owns the Micro-Spec (Spec-Delta) four-field template, the Append-Only pattern, and the Error-to-Spec conversion rules. Use when someone asks to \"just fix\", \"just tweak\", \"quickly change\" something in chat; when writing or reviewing a patch spec. Do NOT use as a substitute for a full docs/specs/*.spec.md on a substantial feature.",
       "kind": "skill",
       "name": "sdd-guardrail",
@@ -55,7 +55,7 @@
       "target": ".agents/skills/sdd-guardrail"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Analyze SDD requirement coverage, criterion verification links, changed specifications, dependencies and orphan references using explicit selected document records. Read-only; use for impact and coverage review, never for marking roadmap progress or replacing governance checkpoints.",
       "kind": "skill",
       "name": "traceability-analysis",
@@ -64,7 +64,7 @@
       "target": ".agents/skills/traceability-analysis"
     },
     {
-      "compatibility": "parziale (YAML originale invalido)",
+      "compatibility": "partial (original YAML invalid)",
       "description": "Build and query index/index.json, the vector (semantic) chunk index over graphify-out/wiki/. Use when a command or agent needs to check whether the project's knowledge base already covers a topic before asking the user or inventing an answer. Triggers: \"search the wiki\", \"check the knowledge base\", \"rebuild the index\", \"does the KB know about X\".",
       "kind": "skill",
       "name": "wiki-semantic-search",
@@ -73,7 +73,7 @@
       "target": ".agents/skills/wiki-semantic-search"
     },
     {
-      "compatibility": "equivalente; dipendenze originali",
+      "compatibility": "equivalent; original dependencies",
       "description": "Use when converting an existing directory of markdown files to OKF-compliant format. Invoke when a wiki, knowledge base, or LLM wiki lacks YAML frontmatter, is missing `type` fields, or needs to be interoperable with OKF consumers. Triggers: \"make this wiki OKF compliant\", \"convert my markdown folder to OKF\", \"add frontmatter to my docs\", \"migrate wiki to OKF\", \"my docs need a type field\", or any request to transform an existing markdown directory into a valid OKF bundle.",
       "kind": "skill",
       "name": "wiki-to-okf",
@@ -82,7 +82,7 @@
       "target": ".agents/skills/wiki-to-okf"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Execute a Specification-Driven Development roadmap: resolve roadmap items from the constitution, plan, produce deliverables (code, tests, docs, infra, config, diagrams, schemas, and more), validate, and publish — one item at a time, with governance over every produced artifact type",
       "kind": "command",
       "name": "sdd-implement",
@@ -91,7 +91,7 @@
       "target": ".agents/skills/sdd-implement/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Interview a business user who has only a product idea and produce a complete Functional Requirements Document at docs/input/functional-requirements.md, ready for /spec-brainstorm",
       "kind": "command",
       "name": "gather-requirements",
@@ -100,7 +100,7 @@
       "target": ".agents/skills/gather-requirements/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Graph-first knowledge pipeline: detect changes in the configured source roots (raw/, docs/specs/), convert binary documents under the configured source root to Markdown under the configured derived directory and extract them as an additional Graphify root, extract the source roots into a Graphify knowledge graph, export it as an Obsidian vault, and make every generated Markdown file conformant with Google Open Knowledge Format (OKF) v0.1.",
       "kind": "command",
       "name": "generate-llm-wiki",
@@ -109,7 +109,7 @@
       "target": ".agents/skills/generate-llm-wiki/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Initialize a new project: generate constitution.md and AGENTS.md from functional specs",
       "kind": "command",
       "name": "init-new-project",
@@ -118,7 +118,7 @@
       "target": ".agents/skills/init-new-project/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Turn a bug, error log, or small change request into a Micro-Spec patch spec under docs/specs/ and append one unchecked item to the constitution's Roadmap, ready for /SDD-implement",
       "kind": "command",
       "name": "micro-spec",
@@ -127,7 +127,7 @@
       "target": ".agents/skills/micro-spec/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Restate requirements, assess risks, and create a step-by-step implementation plan from an engineering/prompt/ file. WAIT for user confirmation before writing the plan.",
       "kind": "command",
       "name": "plan",
@@ -136,7 +136,7 @@
       "target": ".agents/skills/plan/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Structure a raw, free-form ask into the Prompt Engineering framework (tech-plan/the_prompt_engineering.md), grounded only in what the user actually said, then execute it",
       "kind": "command",
       "name": "sdd-prompt-engineering",
@@ -145,7 +145,7 @@
       "target": ".agents/skills/sdd-prompt-engineering/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Publish the generated knowledge bundle: commit graphify-out/ (the OKF/Obsidian bundle and its persistent graph) and index/ on a dedicated branch and push it, respecting raw/ immutability and excluding publication.exclude (derived extraction input). Takes the repository/project name as argument to derive the branch and commit message.",
       "kind": "command",
       "name": "publish-llm-wiki",
@@ -154,7 +154,7 @@
       "target": ".agents/skills/publish-llm-wiki/SKILL.md"
     },
     {
-      "compatibility": "parziale (invocazione e tool adattati)",
+      "compatibility": "partial (invocation and tools adapted)",
       "description": "Transform a functional analysis into implementation-ready technical specifications (architecture, domain/data models) for Spec-Driven Development",
       "kind": "command",
       "name": "spec-brainstorm",
@@ -163,7 +163,7 @@
       "target": ".agents/skills/spec-brainstorm/SKILL.md"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "Optional. Checks whether the project's local knowledge index already covers a topic, question, or open field before it gets asked to the user or filled with a guess. Use when gathering requirements, brainstorming specs, or at any point in a guided interview where existing knowledge should be surfaced first. Returns grounded citations (docTitle + sourcePath) or explicitly reports NO_INDEX / NO_MATCH — never fabricates. Degrades cleanly to a plain interview when no index exists.",
       "kind": "agent",
       "name": "knowledge-searcher",
@@ -172,7 +172,7 @@
       "target": ".codex/agents/knowledge-searcher.toml"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "Turns a bug report, error log, failing test, or one-line change request into a Micro-Spec patch spec at docs/specs/patch-<slug>.spec.md and appends one unchecked roadmap item linking to it in docs/specs/constitution.md. Use when a small, scoped post-implementation fix or polish needs a spec fast. Do NOT use to implement, fix, refactor, or produce any deliverable — it authors the spec only; execution belongs to the SDD implementation workflow. Do NOT use to author full feature specifications.",
       "kind": "agent",
       "name": "micro-spec-author",
@@ -181,7 +181,7 @@
       "target": ".codex/agents/micro-spec-author.toml"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "Expert planning specialist for complex features and refactoring. Use PROACTIVELY when the user requests feature implementation, architectural changes, or complex refactoring. Read-only: it drafts and presents an implementation plan but never writes files — the caller writes the plan after confirmation.",
       "kind": "agent",
       "name": "planner",
@@ -190,7 +190,7 @@
       "target": ".codex/agents/planner.toml"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "Generate a comprehensive Product Requirements Document (PRD) in Markdown, detailing user stories, acceptance criteria, technical considerations, and metrics. Optionally create GitHub issues (via the gh CLI) only upon explicit user confirmation. Invoke for product-level requirements authoring.",
       "kind": "agent",
       "name": "prd",
@@ -199,7 +199,7 @@
       "target": ".codex/agents/prd.toml"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "SDD Structure Governor. Authoritative read-only control layer that enforces declared-structure fidelity, mandatory-section completeness, traceability, assumption labeling, consistency, and professional-quality standards on ANY produced artifact (code, documentation, configuration, scripts, diagrams, schemas). It validates and governs generation; it NEVER generates artifact content itself. Invoke for the SDD structure-governance checkpoint.",
       "kind": "agent",
       "name": "sdd-governor",
@@ -208,7 +208,7 @@
       "target": ".codex/agents/sdd-governor.toml"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "Runs the graph-first knowledge pipeline — extracts the configured source roots into a Graphify knowledge graph, exports it as an Obsidian vault, converts that vault to Google Open Knowledge Format (OKF) v0.1, and validates conformance. Use when: \"rebuild the knowledge graph\", \"refresh second brain\", \"regenerate the wiki\", \"update OKF bundle\". Invoked by /generate-llm-wiki for phases 1-5.",
       "kind": "agent",
       "name": "second-brain-keeper",
@@ -217,7 +217,7 @@
       "target": ".codex/agents/second-brain-keeper.toml"
     },
     {
-      "compatibility": "parziale (permessi e modello)",
+      "compatibility": "partial (permissions and model)",
       "description": "Generate or update AI-ready specification documents for new or existing functionality — clear, unambiguous, machine-readable, self-contained. Invoke when a standalone spec document is needed outside the /spec-brainstorm discovery flow.",
       "kind": "agent",
       "name": "specification",
@@ -226,7 +226,7 @@
       "target": ".codex/agents/specification.toml"
     },
     {
-      "compatibility": "nativa",
+      "compatibility": "native",
       "description": "Selectively undo the latest or a specified genuinely tracked skill run, previewing changes and preserving later edits. Use for explicit rollback requests, dry runs, and recovery of interrupted tracked transactions. Refuse automatic rollback of untracked executions; never use repository-wide reset, clean, or commit reverts.",
       "kind": "skill",
       "name": "rollback",
@@ -238,11 +238,11 @@
   "outputs": {
     ".agents/skills/document-to-markdown": "link:../../.opencode/skills/document-to-markdown",
     ".agents/skills/drawio": "link:../../.opencode/skills/drawio",
-    ".agents/skills/gather-requirements/SKILL.md": "a7020888127d4fbc7e8969816b5fa179771356acf410ae817a3b934c4b8877cc",
+    ".agents/skills/gather-requirements/SKILL.md": "e67b1b7d36421ea99bcbd5a392c1ae8bb86394cffc530707b65f097e0d290c9d",
     ".agents/skills/generate-llm-wiki/SKILL.md": "3e83db4a1df8502833347362cf4cbcbea261dec3bebf258045df7a0962ebccd0",
     ".agents/skills/graph-retrieval": "link:../../.opencode/skills/graph-retrieval",
-    ".agents/skills/init-new-project/SKILL.md": "9d11ecd9b0ca2fb6bd6474a776e501b233568a713fd44f04538afe44b529cb00",
-    ".agents/skills/micro-spec/SKILL.md": "31a1ce252f86694a647c2f0b6b3b99529de7d60cd4944faa9660d2758601e302",
+    ".agents/skills/init-new-project/SKILL.md": "a7f5aec176662a70f1cd0e26efaaae205ed136584737adb9adc985f2a6628e31",
+    ".agents/skills/micro-spec/SKILL.md": "469c520bb8590a003686446724b924c9b743b180ada420c43d1f2736d6c5fa05",
     ".agents/skills/okf-open-knowledge-format": "link:../../.opencode/skills/okf-open-knowledge-format",
     ".agents/skills/plan/SKILL.md": "8ed7e33d4d907d3b69c7e2a4280dcdb64c1a380bf6c2ba07ed3b72f5712c5cea",
     ".agents/skills/prompt-engineering": "link:../../.opencode/skills/prompt-engineering",
@@ -250,13 +250,13 @@
     ".agents/skills/sdd-guardrail": "link:../../.opencode/skills/sdd-guardrail",
     ".agents/skills/sdd-implement/SKILL.md": "d1159d20064e1f80d231aec1fec70c1a57864b0869d3d38ba3b118e2e161b44f",
     ".agents/skills/sdd-prompt-engineering/SKILL.md": "87aaaaf9f7a87806441bff82fb0b16fc748073a7eae0408e18a7cea1b2911ec0",
-    ".agents/skills/spec-brainstorm/SKILL.md": "6065fddb7d599370fb71d473f278c9b9d17f06ed97c63909bbde2ae8236d3978",
+    ".agents/skills/spec-brainstorm/SKILL.md": "6a4cfd62f4ff082ba58483fa3bfd77201ea289d2d9dfe426c326dd179790bcf7",
     ".agents/skills/traceability-analysis": "link:../../.opencode/skills/traceability-analysis",
     ".agents/skills/wiki-semantic-search/SKILL.md": "db3dea541315c77a6f03b17baa37325392dde93a0036c0da1502c33eff707f4e",
     ".agents/skills/wiki-semantic-search/scripts": "link:../../../.opencode/skills/wiki-semantic-search/scripts",
     ".agents/skills/wiki-to-okf": "link:../../.opencode/skills/wiki-to-okf",
     ".codex/agents/knowledge-searcher.toml": "4d274eb40af3535ba8d71238a8fd01977d9f8c62328c7d7bc97ee829ddfaf210",
-    ".codex/agents/micro-spec-author.toml": "7c0a06bd42f6ec994fa93509c8973fc883aff4054eb143c2aca9ff0c2b3d7d23",
+    ".codex/agents/micro-spec-author.toml": "64b016caa5bce5b33ffdf9b73393d32e706495ce1020abceeb9881da8b43e644",
     ".codex/agents/planner.toml": "b8f245d13b82a7c9532a3e1d17fef68506523864d0aef3f8b8e61cc35f1b7bb4",
     ".codex/agents/prd.toml": "5a78a4c64cb28280fa5d5ba3c8c8898a86bb473b7a1e7ebd998cda9f5632e8a3",
     ".codex/agents/sdd-governor.toml": "58c2d9c513e916dec4959fea196b24724ebc734b14ed383b3a1f7c4ecdc2db9e",
@@ -273,7 +273,7 @@
       ".opencode/.gitignore": "663a068e76d264d0bc6740f5450b6c4193c7b41ecf5e0dc222485b8a17404d95",
       ".opencode/agents/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       ".opencode/agents/knowledge-searcher.md": "82fd4418370c093f0e70ad0927c22c81db550eb62ff72306c40010c8e76315df",
-      ".opencode/agents/micro-spec-author.md": "bf35e8e81ff3d476bb34ec856e8151da75705ac88c84ba68091fe4fa179216ae",
+      ".opencode/agents/micro-spec-author.md": "77916c8eb718293f18061fceb7b572886f9838f9170856c075e2d8643ee1b267",
       ".opencode/agents/planner.md": "e01e6c9f3719028bd21c9b424802973a23281762d71c945ee95653ce4c31572a",
       ".opencode/agents/prd.md": "f3cc0faf5a738bc551fd5d1035a59727dde4918bb67dd27a738574d69d7e40fd",
       ".opencode/agents/sdd-governor.md": "5cbd235214923001d54363a10af0653179827ddcf0495972d2f1bc13329adfbf",
@@ -281,14 +281,14 @@
       ".opencode/agents/specification.md": "47cd57acc933b4da092c3e38a4dd03b740468195011a813dbeac8fde6ca1b09d",
       ".opencode/commands/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       ".opencode/commands/SDD-implement.md": "14d5e026af16e1307929c5a79d44349ae4d79d6dda935b8e754b86924143aa06",
-      ".opencode/commands/gather-requirements.md": "87ad343627998a7a6190b3c511c3acd13b99ff72693aac1c18b394ba1c2a7407",
+      ".opencode/commands/gather-requirements.md": "2104f24d8a0885ef71a6faec6e33ad1d6400e6b61087f0d44dd0de29489d6c24",
       ".opencode/commands/generate-llm-wiki.md": "13c392b79688838e3f7e77c70e1b877f81d8643a222359c7873ba6565fe8725b",
-      ".opencode/commands/init-new-project.md": "ed7c6479bc3ca128242867aa9e685b473a3633da92c0bf2bb6cb4ff90379230c",
-      ".opencode/commands/micro-spec.md": "b4b65e416750c9d31c3987269b4732bf75bfe44407c5aecec4d92e28364ee100",
+      ".opencode/commands/init-new-project.md": "01273646d1216997fd207021e28d865f12e3079c7eacd43240b6061a2a53aa66",
+      ".opencode/commands/micro-spec.md": "a4bde3f0f3496d69f20df6dd96038b15140976af2593c5fd71a4ee0cc95f69f6",
       ".opencode/commands/plan.md": "b57a2d5b206da8d2eddfeb16e2c434a376541015b635217c57e13721eb7e256b",
       ".opencode/commands/prompt-engineering.md": "7d160a5fff9671efdb7fb745b6e91c8bead1d804f85c1e5ad7024965bbc1bbf2",
       ".opencode/commands/publish-llm-wiki.md": "9c11e3666e06067f282b7ff0901363e6956383d61f452fc7dae8003002e8ce34",
-      ".opencode/commands/spec-brainstorm.md": "ca1218c44d320fe9b805fe80590502835e1130cc7ca7215da50659bc0982e8c2",
+      ".opencode/commands/spec-brainstorm.md": "3e997850388601beead0073b1020e46b004c57ee3912068651b1d46189de874f",
       ".opencode/node_modules/.package-lock.json": "1ccb881d2187189b3f9b1eb04c7e5e6e6578b17c5a8df93070864eac97577a39",
       ".opencode/node_modules/@ai-sdk/provider/CHANGELOG.md": "10730ae593d146d02ca483157fc1cab14fef76b331481e04daf2878c31b0322c",
       ".opencode/node_modules/@ai-sdk/provider/LICENSE": "b4f9adb7c568904834d0dd6cc98d16c390d21ca32fc17ae7a267715269bd5529",
@@ -3937,26 +3937,27 @@
       ".opencode/node_modules/zod/v4/package.json": "5cb4c7dad36258f0c5b26d914adfebd66105dddc4af3c12d2b3173e7e5674191",
       ".opencode/package-lock.json": "b1455aeb96f61dd2348ef48990c485653fc91d3b0b8c0de7d8a51938ba706e9a",
       ".opencode/package.json": "da94c1e41c604fb58535a9c4e7fd19e96468516b37d975ffacf9eacda13c8f09",
-      ".opencode/plugins/rtk.ts": "6530c131946c84892f9522abd68d4e513e1e658d8ddbad1f59388c86ebbcb6bb",
+      ".opencode/plugins/dcp/dcp.jsonc": "6e8330eadd0bbbeaea5b5e273f6d2bf1201b0d9aa1aef4fdaef7f1c46e9473dc",
+      ".opencode/plugins/rtk/rtk.ts": "6530c131946c84892f9522abd68d4e513e1e658d8ddbad1f59388c86ebbcb6bb",
       ".opencode/skills/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      ".opencode/skills/document-to-markdown/SKILL.md": "7ddf5561204328ca0b62fefa9a8917f409733cfcdc73205c90459e9b02fde4ab",
-      ".opencode/skills/document-to-markdown/scripts/convert_documents.py": "a3fdeae67bc7ac128732866382444fda9ead6d96e5f9e7584ef37b480b860c51",
+      ".opencode/skills/document-to-markdown/SKILL.md": "fe1218e13029ea1e5ce74ae12b74172c0c2b07bc794d329c2d9bc89595829d6a",
+      ".opencode/skills/document-to-markdown/scripts/convert_documents.py": "ace90a02b5cd82057c6901ff99edef218eb98608a40714a1996606c9f032b223",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/__init__.py": "3bb152db08781444bfd8c58e23ddcef7b3bb4321dc7ed55711eae68e9652d191",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/__init__.py": "3d2cf39dd8d3d6f6731478d0b51faefc35cbf65344f1bfea8a710c5cfc22059c",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/base.py": "569ef8730413df64bfe4ec8bed1fa300942bcbb52971f5c04ca23b5ddf169d1a",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/csv_adapter.py": "7a0138863875fe663c123a13b1c9a855b0cfb0b5d9d3ef1a58d9897eb38eaf27",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/legacy.py": "8f0ae770c2dfcb434711171e24d11a037fe6d564b1b0f2ed50807f0907f16040",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/pandoc.py": "0f3c59462ad1a58638be1c52c6682d8d9422a26cc9597d985887a1bd2a3bb9c8",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/pdf.py": "f0d58614dfb9a3653ea5c34d1b0605c123ce08013abc76838ff4b634bd3462ee",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/base.py": "86a2ddfb0230ed2f1d3e7a2ae7378197e98246bbfa59acda9fce9f10570d90af",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/csv_adapter.py": "3a22976c0107261ff12bc1872b047cdf80dcb23a1d522194acfedde92536a627",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/legacy.py": "ce78e2f2c1a79d73a99aa253e6d3c163f48258ea92258df7e4bece285fd30e71",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/pandoc.py": "17863e8383c4288055a814c43a4568207bdfafa983cc3c2f719b5e634211f054",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/pdf.py": "c7248cb02deff7e80c853b4ebe2e27e8409a262c4987fa40eef3aea213af6a7d",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/util.py": "f6f0974f576b74d83360019e9b46896278e7fc7dee6ae4ce08b8582fc824f160",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/xlsx.py": "96220289cded54c7fba5aa5494ab0f1680fc9894afa95fac419a10150ec48eb0",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/config.py": "fede31ff8160e87b7bc82ba1f4332b4951dc1a6cf9ab998ac2efd31f9bd867ef",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/adapters/xlsx.py": "a14a089e28b41a633f82f8ed66687e8cc4fe507604ea31ca98bb1e4d7ab5c3aa",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/config.py": "7bf6a727b0f5dcddc064412b39e6a6e35cc60ee09c2800ee6414168ca7f84ca6",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/digest.py": "0713c5d8b3ffa3994430526e9ec854fe5ffcf14a1ee3c83af9eea3bc2670693b",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/discovery.py": "18fe338f38fc0d7d0451180538a60f834477796ebc7d2a61832960519ef5bc74",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/discovery.py": "4efc5898f800849f61dc4fd6c332a7665d739751538f37ca99caa5c91d1af99b",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/errors.py": "b5845940851bbcb3563f88e212ba894eca5092943b173c91194e208f32c125ea",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/guard.py": "a1007c68c4b40ee973f75494995ebecbbc06983d62a55e7a3dd25ce38b3fb613",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/map.py": "f521b12461ee8413730dd537edfc640d34f9dc67905bbc071817a31b8a354973",
-      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/orchestrator.py": "806289ebbe3c9b15afcfc986c475a36cd72850d1206140a8444296b6fd159f06",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/guard.py": "3c0ed2ea1e092d5a191e6f5f43bc4c391f5e88a531f8894cd2db9e7b34899df8",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/map.py": "2e4e5b51bba3b302a1f66864cc7c49171e72ac9b77b2ad60b254260368c9c776",
+      ".opencode/skills/document-to-markdown/scripts/document_to_markdown/orchestrator.py": "8f4cce6592725c96bdb7cabbca4b34b1998729dffc9a026487e60252b7f11f5c",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/registry.py": "d785dd448e10ff1244b5f3949df7e5600725e43ab622062e431a6077fba88ac9",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/report.py": "3abd846a88af122f01645b0058e679593b1addc3a20f484ff627fa96888ee266",
       ".opencode/skills/document-to-markdown/scripts/document_to_markdown/slug.py": "11e411401eb0fb7022b0978fc474467268074df7da617a251c069af03fd6d025",
@@ -3968,17 +3969,15 @@
       ".opencode/skills/okf-open-knowledge-format/references/spec-v01.md": "b9655e607346dbbdc6de21190e9a953313eda6a7eba68d4d272a65975940ad6e",
       ".opencode/skills/okf-open-knowledge-format/scripts/validate.sh": "80fa580a07dfdc68eacd46d5b576bc7db7f5b8a9dd222b5a8daff04bb8bfbd95",
       ".opencode/skills/prompt-engineering/SKILL.md": "c3008f88b24e59ce11a648611fe5b36b192f403a23d6142c256c029db315b8d7",
-      ".opencode/skills/sdd-guardrail/SKILL.md": "2a6361d83aa9e001f44678f688fb9c5484df2b20c6306d34fb80c272a2a50b46",
+      ".opencode/skills/sdd-guardrail/SKILL.md": "9351344b0dd7d16352452f7c0117ae1cb6df1dc1005a82a96332cc5192ab243e",
       ".opencode/skills/traceability-analysis/SKILL.md": "b8275cbd2b13db15ff71b2c8f754ce4dbf52b6e168136243b8838d376f8e2a7f",
       ".opencode/skills/wiki-semantic-search/SKILL.md": "8863db1b6261e4dcbf7ca8889002eccc4ee8622bf1bb822015f3d4dfbb1b3289",
-      ".opencode/skills/wiki-semantic-search/scripts/__pycache__/build_index.cpython-314.pyc": "8b7ba1317735d2074192d704209aafaec195f99e2a2597de7a757ab125273a13",
-      ".opencode/skills/wiki-semantic-search/scripts/__pycache__/query_index.cpython-314.pyc": "7fbe449d74def302378978e91099956d364b5249ebc843ba4ed1a954c077b1b9",
-      ".opencode/skills/wiki-semantic-search/scripts/build_index.py": "84c1c2f68f55de22e2dd8a0345a1767be6ea9757d5d0dc1b2c449f3df8283ab2",
+      ".opencode/skills/wiki-semantic-search/scripts/build_index.py": "07279161d17449c0689f5c88f0295a443729835f8a00369e5ca8dd790499458b",
       ".opencode/skills/wiki-semantic-search/scripts/query_index.py": "c51631792616d7b288f891fceaaecbb92f3da0c2f9d168e43bb892cbbf71e555",
       ".opencode/skills/wiki-to-okf/SKILL.md": "974cf6c8879abb202f8aa4657f1f1d9f8b3476f1e516146afc5038b1ced15b75",
-      "AGENTS.md": "f5f4e4b06d90157561b40af02fac3a68d2e566102ce938257c4cb1cf981d09c9",
+      "AGENTS.md": "aceadecc1a551a629702c25203a452d2efc1f8a0574a5bf89d6b21d7cc62d144",
       "knowledge-config.json": "055914739c3d703750af5289bdf144798a0315cfb09f5df3d6f5c1333fd6e476",
-      "opencode.json": "f1c7ca1b19b9f30d485798b5aa89095856f4949269d19ce660f6fd5988bdb78f"
+      "opencode.json": "f2395fd4deecb8cdc6b7e914d66f45c0dec482bb5b9be43a34d32b8ee7e4e73d"
     },
     "symlinks": {
       ".opencode/node_modules/.bin/download-msgpackr-prebuilds": "../msgpackr-extract/bin/download-prebuilds.js",

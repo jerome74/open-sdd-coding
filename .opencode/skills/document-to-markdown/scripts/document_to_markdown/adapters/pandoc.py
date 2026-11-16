@@ -26,7 +26,7 @@ class PandocAdapter(Adapter):
         pandoc = require_tool(["pandoc"])
         if media_dir.parent != out_md.parent:
             raise ConversionError(
-                "adapter pandoc: Markdown e directory media devono essere sorelle",
+                "pandoc adapter: Markdown and media directory must be siblings",
                 code="INTERNAL",
             )
         out_md.parent.mkdir(parents=True, exist_ok=True)
@@ -40,7 +40,7 @@ class PandocAdapter(Adapter):
         run_tool(command, cwd=out_md.parent)
         if not out_md.is_file():
             raise ConversionError(
-                f"pandoc non ha prodotto '{out_md}': documento corrotto o non leggibile",
+                f"pandoc produced no '{out_md}': corrupt or unreadable document",
                 code="CORRUPT",
             )
         media = _normalize_media(out_md, media_dir)

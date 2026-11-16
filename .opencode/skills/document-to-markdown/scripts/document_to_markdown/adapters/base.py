@@ -46,9 +46,9 @@ def require_tool(candidates: Sequence[str], *, label: str | None = None) -> str:
         found = shutil.which(candidate)
         if found:
             return found
-    names = " o ".join(candidates)
+    names = " or ".join(candidates)
     raise ConversionError(
-        f"tool richiesto non trovato: {label or names}. Installarlo e riprovare.",
+        f"required tool not found: {label or names}. Install it and retry.",
         code="TOOL_MISSING",
     )
 
@@ -64,18 +64,18 @@ def run_tool(command: Sequence[str], *, cwd: Path | None = None) -> subprocess.C
             check=False,
         )
     except FileNotFoundError as exc:
-        raise ConversionError(f"tool non trovato: '{command[0]}'", code="TOOL_MISSING") from exc
+        raise ConversionError(f"tool not found: '{command[0]}'", code="TOOL_MISSING") from exc
     except subprocess.TimeoutExpired as exc:
         raise ConversionError(
-            f"timeout di {TOOL_TIMEOUT_SECONDS}s eseguendo '{command[0]}'",
+            f"timeout after {TOOL_TIMEOUT_SECONDS}s while running '{command[0]}'",
             code="TOOL_TIMEOUT",
         ) from exc
     except OSError as exc:
-        raise ConversionError(f"impossibile eseguire '{command[0]}': {exc}", code="TOOL_ERROR") from exc
+        raise ConversionError(f"cannot run '{command[0]}': {exc}", code="TOOL_ERROR") from exc
 
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or "").strip()
         if not detail:
             detail = f"exit {result.returncode}"
-        raise ConversionError(f"'{Path(command[0]).name}' è fallito: {detail}", code="TOOL_ERROR")
+        raise ConversionError(f"'{Path(command[0]).name}' failed: {detail}", code="TOOL_ERROR")
     return result

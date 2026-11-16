@@ -32,13 +32,13 @@ Create `constitution.md` in the `docs/specs/` folder, following the template str
 - **Tech Stack**: Extract from specs or infer from existing project structure. Pin specific versions where the specs state them. Define mandatory architectural patterns and constraints.
 - **Roadmap**: Generate a checklist of features derived from each spec file in `docs/specs/`, linking back to the spec filenames.
 
-Language: Italian (matching specs).
+Language: English — the constitution is a repository artifact (AGENTS.md §5).
 
 ### Step 3 — Generate `AGENTS.md`
 
 Create `AGENTS.md` at the **project root** — it is the primary instructions file OpenCode auto-loads for this project. **Do not create or edit `CLAUDE.md`.** Contextualize `AGENTS.md` for the project:
 
-- Reference `constitution.md` as the **Costituzione SDD** (Spec-Driven Development) del progetto — the authoritative source for project mission, principles, tech stack, and roadmap.
+- Reference `constitution.md` as the **SDD Constitution** (Spec-Driven Development) of the project — the authoritative source for project mission, principles, tech stack, and roadmap.
 - Include a General Agent Guidelines section with rules for: think before coding, simplicity first, surgical changes, goal-driven execution.
 - Include project-specific conventions derived from the tech stack.
 - Preserve any existing framework rules already in `AGENTS.md` (sources, Conductor rule,

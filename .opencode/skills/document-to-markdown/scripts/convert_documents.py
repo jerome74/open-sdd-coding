@@ -30,29 +30,29 @@ from document_to_markdown.orchestrator import Orchestrator
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="convert_documents.py",
-        description="Converte documenti locali in Markdown + media sotto <out_dir>/<root-slug>/.",
+        description="Convert local documents to Markdown + media under <out_dir>/<root-slug>/.",
     )
     parser.add_argument(
         "--root",
         action="append",
         required=True,
         metavar="DIR",
-        help="directory di input (ripetibile)",
+        help="input directory (repeatable)",
     )
     parser.add_argument(
         "--out",
         metavar="DIR",
-        help="directory di output (default: graphify-out/derived)",
+        help="output directory (default: graphify-out/derived)",
     )
     parser.add_argument(
         "--config",
         metavar="FILE",
-        help="file JSON di configurazione della skill",
+        help="skill JSON configuration file",
     )
     parser.add_argument(
         "--json",
         action="store_true",
-        help="stampa su stdout {status, counts, errors}",
+        help="print {status, counts, errors} to stdout",
     )
     return parser
 
@@ -63,17 +63,17 @@ def main(argv: list[str] | None = None) -> int:
     try:
         config = load_config(Path(args.config) if args.config else None, out_dir=args.out)
     except ConfigError as exc:
-        print(f"errore di configurazione: {exc}", file=sys.stderr)
+        print(f"configuration error: {exc}", file=sys.stderr)
         return 2
 
     roots = [Path(item) for item in args.root]
     try:
         report = Orchestrator(config, build_default_registry()).run(roots)
     except (ConfigError, PathError) as exc:
-        print(f"errore: {exc}", file=sys.stderr)
+        print(f"error: {exc}", file=sys.stderr)
         return 2
     except OSError as exc:
-        print(f"errore I/O: {exc}", file=sys.stderr)
+        print(f"I/O error: {exc}", file=sys.stderr)
         return 1
 
     if args.json:
@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
 
     counts = report.counts
     print(
-        "totale: {total} · convertiti: {converted} · saltati: {skipped} · errori: {errors}".format(
+        "total: {total} · converted: {converted} · skipped: {skipped} · errors: {errors}".format(
             **counts
         ),
         file=sys.stderr,

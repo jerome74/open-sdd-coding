@@ -38,7 +38,7 @@ class CsvAdapter(Adapter):
 
         out_md.parent.mkdir(parents=True, exist_ok=True)
         if not rows:
-            body = "_(file vuoto)_"
+            body = "_(empty file)_"
         else:
             body = render_table(rows)
         out_md.write_text(f"# {source.stem}\n\n{body}\n", encoding="utf-8")

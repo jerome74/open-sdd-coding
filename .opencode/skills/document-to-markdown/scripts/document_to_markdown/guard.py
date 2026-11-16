@@ -38,8 +38,8 @@ def assert_writable(path: str | Path, roots: list[Path], out_dir: str | Path) ->
     resolved = resolve_path(path)
     destination = resolve_path(out_dir)
     if not is_within(resolved, destination):
-        raise PathError(f"scrittura rifiutata: '{resolved}' non è dentro '{destination}'")
+        raise PathError(f"write refused: '{resolved}' is not inside '{destination}'")
     for root in roots:
         if is_within(resolved, root):
-            raise PathError(f"scrittura rifiutata: '{resolved}' è dentro il root di input '{resolve_path(root)}'")
+            raise PathError(f"write refused: '{resolved}' is inside the input root '{resolve_path(root)}'")
     return resolved

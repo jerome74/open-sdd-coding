@@ -52,7 +52,7 @@ class LegacyAdapter(Adapter):
             candidates = sorted(temp_dir.glob(f"*{target_suffix}"))
             if not candidates:
                 raise ConversionError(
-                    f"LibreOffice non ha prodotto un file '{target_suffix}' da '{source}'",
+                    f"LibreOffice produced no '{target_suffix}' file from '{source}'",
                     code="TOOL_ERROR",
                 )
             converted_source = candidates[0]

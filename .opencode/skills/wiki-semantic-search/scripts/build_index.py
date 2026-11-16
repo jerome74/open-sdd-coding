@@ -191,7 +191,7 @@ def _load_backend(model_name: str) -> EmbedBackend:
     )
     raise IndexBuildError(
         f"no local embedding backend could serve {model_name!r}: {detail}; "
-        "indexing must stay on-machine (constitution, Principio 6)"
+        "indexing must stay on-machine (constitution, Principle 6)"
     )
 
 
@@ -286,7 +286,7 @@ def serialize_index(
     """Write the index into the already-created `stage_root`. Returns a summary.
 
     `index_filename` is the single-file name, derived from the configured `semantic_index`
-    (Principio 5); it is never assumed to be `index.json`. The compressed layout's manifest is
+    (Principle 5); it is never assumed to be `index.json`. The compressed layout's manifest is
     named `manifest.json` (layout constant documented in the plan, OTQ-03).
     """
     items = payload["items"]
@@ -476,7 +476,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    extra = f" ({len(result['errors'])} note segnalate)" if result["errors"] else ""
+    extra = f" ({len(result['errors'])} notes reported)" if result["errors"] else ""
     print(
         f"Built {result['index_path']} [{result['format']}]: "
         f"{result['items']} chunks from {result['documents']} documents — {result['status']}{extra}"

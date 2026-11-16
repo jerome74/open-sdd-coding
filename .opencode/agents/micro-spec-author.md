@@ -53,18 +53,18 @@ any of it here.
 
 ## Step 1 — resolve the slug
 
-kebab-case, ≤5 words, derived from the expected behavior (*comportamento atteso*). If
+kebab-case, ≤5 words, derived from the expected behavior (*Expected behavior* field). If
 `docs/specs/patch-<slug>.spec.md` already exists, append `-2`, `-3`, … until the path is free.
 Never overwrite an existing patch spec.
 
 ## Step 2 — verify the scope
 
-Every file listed in *Scope limitato* must exist — check each with grep/read/glob. A path that
+Every file listed in *Limited scope* must exist — check each with grep/read/glob. A path that
 does not resolve is reported back to the caller, not silently written into the spec.
 
 ## Step 3 — write the patch spec
 
-Write `docs/specs/patch-<slug>.spec.md`. Italian body, following the skeleton in `sdd-guardrail`
+Write `docs/specs/patch-<slug>.spec.md`. English body, following the skeleton in `sdd-guardrail`
 exactly (do not improvise sections or reorder them).
 
 ## Step 4 — append the roadmap item

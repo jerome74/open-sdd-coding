@@ -1,13 +1,13 @@
-# <nome progetto>: Constitution
+# <project name>: Constitution
 
 ## Mission
-<Un obiettivo "North Star" orientato all'azione che definisce lo scopo univoco e i beneficiari del modulo. 
-Una narrazione del problema che descrive il contesto tecnico, le incongruenze attuali e i punti critici. 
-Un elenco gerarchico di principi non negoziabili come il determinismo, la robustezza e la singola fonte di verità.>
+<An action-oriented "North Star" objective that defines the unique purpose and the beneficiaries of the module.
+A problem narrative describing the technical context, the current inconsistencies and the pain points.
+A hierarchical list of non-negotiable principles such as determinism, robustness and single source of truth.>
 
 ## Tech Stack
-<Versioni specifiche di linguaggi e framework per impedire all'AI di utilizzare librerie obsolete o fare assunzioni. 
-Pattern architetturali obbligatori, vincoli tecnici su complessità, obbligo di type hints e standard rigorosi per la gestione degli errori.>
+<Specific versions of languages and frameworks to prevent the AI from using obsolete libraries or making assumptions.
+Mandatory architectural patterns, technical constraints on complexity, type-hint requirements and strict error-handling standards.>
 
 ## Roadmap
-<Checklist delle funzionalità esplicitate in /docs/specs/>
+<Checklist of the features expressed in /docs/specs/>

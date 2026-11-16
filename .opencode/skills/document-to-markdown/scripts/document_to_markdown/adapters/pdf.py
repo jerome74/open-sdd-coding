@@ -41,7 +41,7 @@ class PdfAdapter(Adapter):
                 if not text.strip():
                     continue
                 fence = fence_for(text)
-                sections.append(f"## Pagina {number}\n\n{fence}\n{text}\n{fence}")
+                sections.append(f"## Page {number}\n\n{fence}\n{text}\n{fence}")
             out_md.write_text("\n\n".join(sections).rstrip() + "\n", encoding="utf-8")
             return ConversionResult(converted=out_md, media=None, tool="pdftotext")
 
@@ -61,12 +61,12 @@ class PdfAdapter(Adapter):
         images = sorted(media_dir.glob("page*.png"), key=_page_number)
         if not images:
             raise ConversionError(
-                "pdftoppm non ha prodotto immagini: PDF illeggibile o non supportato",
+                "pdftoppm produced no images: unreadable or unsupported PDF",
                 code="TOOL_ERROR",
             )
 
-        sections = [f"# {source.stem}", "_PDF senza testo: pagine renderizzate come immagini._"]
+        sections = [f"# {source.stem}", "_PDF without text: pages rendered as images._"]
         for number, image in enumerate(images, start=1):
-            sections.append(f"## Pagina {number}\n\n![Pagina {number}]({media_dir.name}/{image.name})")
+            sections.append(f"## Page {number}\n\n![Page {number}]({media_dir.name}/{image.name})")
         out_md.write_text("\n\n".join(sections).rstrip() + "\n", encoding="utf-8")
         return ConversionResult(converted=out_md, media=media_dir, tool="pdftoppm")

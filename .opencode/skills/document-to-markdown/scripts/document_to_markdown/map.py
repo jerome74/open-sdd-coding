@@ -49,7 +49,7 @@ def make_entry(
     error: str | None = None,
 ) -> dict[str, Any]:
     if status == "error" and source_sha256 is not None:
-        raise ValueError("source_sha256 deve essere null con status 'error'")
+        raise ValueError("source_sha256 must be null with status 'error'")
     return {
         "status": status,
         "converted": converted,
@@ -68,18 +68,18 @@ def load_map(path: str | Path, root_name: str) -> dict[str, Any]:
     try:
         data = json.loads(map_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise ConversionError(f"mappa non valida '{map_path}': {exc}", code="MAP") from exc
+        raise ConversionError(f"invalid map '{map_path}': {exc}", code="MAP") from exc
     if not isinstance(data, dict):
-        raise ConversionError(f"mappa non valida '{map_path}': atteso un oggetto JSON", code="MAP")
+        raise ConversionError(f"invalid map '{map_path}': expected a JSON object", code="MAP")
     if data.get("version") != MAP_VERSION:
         raise ConversionError(
-            f"mappa non valida '{map_path}': version attesa {MAP_VERSION}, trovata {data.get('version')!r}",
+            f"invalid map '{map_path}': expected version {MAP_VERSION}, found {data.get('version')!r}",
             code="MAP",
         )
     if not isinstance(data.get("entries"), dict):
-        raise ConversionError(f"mappa non valida '{map_path}': 'entries' non è un oggetto", code="MAP")
+        raise ConversionError(f"invalid map '{map_path}': 'entries' is not an object", code="MAP")
     if not isinstance(data.get("root"), str):
-        raise ConversionError(f"mappa non valida '{map_path}': 'root' mancante", code="MAP")
+        raise ConversionError(f"invalid map '{map_path}': 'root' is missing", code="MAP")
     return data
 
 

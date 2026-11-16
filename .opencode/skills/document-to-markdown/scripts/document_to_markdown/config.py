@@ -37,19 +37,19 @@ class Config:
 
 def _as_bool(value: Any, key: str) -> bool:
     if not isinstance(value, bool):
-        raise ConfigError(f"chiave '{key}': atteso booleano, trovato {type(value).__name__}")
+        raise ConfigError(f"key '{key}': expected boolean, found {type(value).__name__}")
     return value
 
 
 def _as_int(value: Any, key: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
-        raise ConfigError(f"chiave '{key}': atteso intero, trovato {type(value).__name__}")
+        raise ConfigError(f"key '{key}': expected integer, found {type(value).__name__}")
     return value
 
 
 def _as_out_dir(value: Any) -> Path:
     if not isinstance(value, str) or not value.strip():
-        raise ConfigError("chiave 'out_dir': attesa stringa non vuota")
+        raise ConfigError("key 'out_dir': expected a non-empty string")
     return Path(value).expanduser()
 
 
@@ -62,16 +62,16 @@ def load_config(path: Path | None = None, *, out_dir: str | Path | None = None) 
         try:
             raw = config_path.read_text(encoding="utf-8")
         except OSError as exc:
-            raise ConfigError(f"impossibile leggere la configurazione '{config_path}': {exc}") from exc
+            raise ConfigError(f"cannot read configuration '{config_path}': {exc}") from exc
         try:
             data = json.loads(raw)
         except json.JSONDecodeError as exc:
-            raise ConfigError(f"configurazione non valida '{config_path}': {exc}") from exc
+            raise ConfigError(f"invalid configuration '{config_path}': {exc}") from exc
         if not isinstance(data, dict):
-            raise ConfigError(f"configurazione '{config_path}': atteso un oggetto JSON")
+            raise ConfigError(f"configuration '{config_path}': expected a JSON object")
         unknown = sorted(set(data) - _ALLOWED_KEYS)
         if unknown:
-            raise ConfigError(f"configurazione '{config_path}': chiavi non supportate: {', '.join(unknown)}")
+            raise ConfigError(f"configuration '{config_path}': unsupported keys: {', '.join(unknown)}")
         values = data
 
     cfg = Config()
@@ -80,14 +80,14 @@ def load_config(path: Path | None = None, *, out_dir: str | Path | None = None) 
     if "pdf_dpi" in values:
         dpi = _as_int(values["pdf_dpi"], "pdf_dpi")
         if dpi <= 0:
-            raise ConfigError("chiave 'pdf_dpi': deve essere maggiore di zero")
+            raise ConfigError("key 'pdf_dpi': must be greater than zero")
         cfg = replace(cfg, pdf_dpi=dpi)
     if "skip_unchanged" in values:
         cfg = replace(cfg, skip_unchanged=_as_bool(values["skip_unchanged"], "skip_unchanged"))
     if "prune" in values:
         prune = _as_bool(values["prune"], "prune")
         if prune:
-            raise ConfigError("prune non implementato: impostare 'prune' a false")
+            raise ConfigError("prune not implemented: set 'prune' to false")
         cfg = replace(cfg, prune=prune)
 
     if out_dir is not None:
@@ -103,6 +103,6 @@ def validate_out_dir(config: Config, roots: list[Path]) -> None:
     for root in roots:
         resolved = resolve_path(root)
         if out_dir == resolved:
-            raise PathError(f"la directory di output '{out_dir}' coincide con il root di input '{resolved}'")
+            raise PathError(f"output directory '{out_dir}' coincides with the input root '{resolved}'")
         if is_within(out_dir, resolved):
-            raise PathError(f"la directory di output '{out_dir}' è dentro il root di input '{resolved}'")
+            raise PathError(f"output directory '{out_dir}' is inside the input root '{resolved}'")

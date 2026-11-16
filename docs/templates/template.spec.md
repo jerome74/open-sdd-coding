@@ -1,67 +1,67 @@
-# Specifica: <nome funzionalità>
+# Specification: <feature name>
 
-## Obiettivo
-<Descrizione sintetica di cosa la funzionalità deve consentire>
+## Objective
+<Brief description of what the feature must allow>
 
-## Valore per l’utente
-<Beneficio concreto per l’utente>
+## Value for the user
+<Concrete benefit for the user>
 
-## Ambito
+## Scope
 
-Incluso:
-- <elemento incluso>
-- <elemento incluso>
+Included:
+- <included item>
+- <included item>
 
-Escluso:
-- <elemento escluso>
-- <elemento escluso>
+Excluded:
+- <excluded item>
+- <excluded item>
 
-## Attori
-- Utente
-- Sistema applicativo
-- <eventuali altri attori>
+## Actors
+- User
+- Application system
+- <any other actors>
 
-## Precondizioni
-- <condizione necessaria prima dell’uso>
-- <condizione necessaria prima dell’uso>
+## Preconditions
+- <condition required before use>
+- <condition required before use>
 
 ## Trigger
-<Evento che avvia il flusso, se rilevante>
+<Event that starts the flow, if relevant>
 
-## Flusso principale
-1. <azione utente o sistema>
-2. <azione utente o sistema>
-3. <azione utente o sistema>
+## Main flow
+1. <user or system action>
+2. <user or system action>
+3. <user or system action>
 
-## <Sezione dati specifica>
-<Campi, KPI, endpoint, componenti o informazioni visualizzate/trattate>
+## <Specific data section>
+<Fields, KPIs, endpoints, components or information displayed or handled>
 
-## Regole funzionali
+## Functional rules
 
-### RF-01 — <titolo regola>
-<Comportamento richiesto>
+### RF-01 — <rule title>
+<Required behaviour>
 
-## Casi limite
+## Edge cases
 
-### CL-01 — <titolo caso limite>
-<Comportamento atteso in condizione particolare>
+### CL-01 — <edge case title>
+<Expected behaviour under the specific condition>
 
-## Casi di errore
+## Error cases
 
-### CE-01 — <titolo errore>
-<Comportamento atteso in caso di errore>
+### CE-01 — <error title>
+<Expected behaviour on error>
 
-## Vincoli UX
-- <vincolo di usabilità>
-- <vincolo di feedback o leggibilità>
+## UX constraints
+- <usability constraint>
+- <feedback or readability constraint>
 
-## Vincoli di performance
-- <tempo massimo o carico minimo supportato>
+## Performance constraints
+- <maximum time or minimum supported load>
 
-## Vincoli di sicurezza
-- <validazione, protezione dati, assenza dettagli interni>
+## Security constraints
+- <validation, data protection, absence of internal details>
 
 ## Acceptance criteria
 
 ### AC-01
-Dato <contesto>, quando <azione>, allora <risultato atteso>.
+Given <context>, when <action>, then <expected result>.

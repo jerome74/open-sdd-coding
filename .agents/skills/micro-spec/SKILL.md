@@ -40,14 +40,14 @@ one-line change request. If empty, ask one question to get whichever the operato
 Deliberate deviation from `gather-requirements`'s one-question-per-message rule: friction is the
 thing this feature exists to kill. Pre-fill the four Micro-Spec fields from the input:
 
-- *Comportamento attuale* — from the quoted log/error/failing test, verbatim in a fenced block;
+- *Current behavior* — from the quoted log/error/failing test, verbatim in a fenced block;
   from the current behavior the change request implies otherwise.
-- *Comportamento atteso* — from the change request, or from what fixing the error implies.
-- *Scope limitato* — from paths named in the log/description, confirmed against the filesystem
+- *Expected behavior* — from the change request, or from what fixing the error implies.
+- *Limited scope* — from paths named in the log/description, confirmed against the filesystem
   with grep/glob. Never guess a file into scope.
-- *Test di validazione* — from an existing test the log names, else a one-line manual check.
+- *Validation test* — from an existing test the log names, else a one-line manual check.
 
-Present all four filled fields in one message and ask a single "ok / cambia X". Ask a real
+Present all four filled fields in one message and ask a single "ok / change X". Ask a real
 question only for a field that cannot be derived from the input.
 
 ## Step 2 — delegate
@@ -66,13 +66,13 @@ this one.
 
 ## Interaction language
 
-The operator's language, default Italian (matching `gather-requirements`). The patch spec itself
-is written in Italian.
+The operator's language, default Italian (matching `gather-requirements`) — for the conversation.
+The patch spec itself is written in English, like every other repository artifact (AGENTS.md §5).
 
 ## Closing rules
 
 - Never implement the fix inside this command — authoring only.
 - Never check off a roadmap item — only `$sdd-implement` does that.
 - Never create `constitution.md` — if it's missing, stop and point at `$init-new-project`.
-- Never widen *Scope limitato* beyond what the operator confirmed.
+- Never widen *Limited scope* beyond what the operator confirmed.
 - One Micro-Spec per invocation.

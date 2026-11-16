@@ -37,7 +37,7 @@ def discover(root: str | Path) -> list[Path]:
 
     root_path = resolve_path(root)
     if not root_path.is_dir():
-        raise PathError(f"root di input non trovato o non è una directory: '{root_path}'")
+        raise PathError(f"input root not found or not a directory: '{root_path}'")
 
     found: list[Path] = []
     for current, dirnames, filenames in os.walk(root_path, followlinks=False):

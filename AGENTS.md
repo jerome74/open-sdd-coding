@@ -1,34 +1,34 @@
 # AGENTS.md — OpenCode SDD Framework (DeepSeek)
 
-Nucleo minimo delle regole di processo, caricato a ogni richiesta: tutto il resto si legge **solo quando serve**.
+Minimal process core, loaded on every request: read everything else only when needed.
+**SDD Constitution** — `docs/specs/constitution.md`: mission, non-negotiable principles, tech stack, `## Roadmap`. Not auto-loaded: read it before any SDD work or when in doubt about *what* to build (it wins). Missing → roadmap not initialized: `/init-new-project`.
 
-## 0. Fonti
-- **Costituzione SDD** `docs/specs/constitution.md` — Mission, principi non negoziabili, Tech Stack, `## Roadmap`. **Non** è auto-caricata: leggila prima di lavoro SDD o in caso di dubbio su *cosa* costruire (vince lei). Assente → roadmap non inizializzata: `/init-new-project`.
-- **Capability Registry** `docs/sdd/capability-registry.md` — asset per ruolo + model matrix; fallback di `/SDD-implement` Fase 0.
-- **Config** — `opencode.json` (provider, modello, permessi), `knowledge-config.json` (percorsi e leve della knowledge pipeline: mai hard-coded).
-- **Knowledge base** — prima di rispondere su contenuti di progetto consulta `python3 scripts/cag_context.py "<q>"` e **cita le note**; nessun risultato → dichiaralo, non inventare; non leggere `raw/` come fonte di risposta (FR-011, BR-1).
+## 0. Sources
+- **Capability Registry** `docs/sdd/capability-registry.md` — assets per role + model matrix; `/SDD-implement` Phase 0 fallback (path unresolved in this repo: generated fallback `.codex/capability-registry.md`).
+- **Config** — `opencode.json` (provider, model, permissions), `knowledge-config.json` (knowledge pipeline paths and levers: never hard-coded).
+- **Knowledge base** — before answering about project content run `python3 scripts/cag_context.py "<q>"` and **cite the notes**; no result → say so, never invent; never read `raw/` as an answer source (FR-011, BR-1).
 
-## 1. Regole generali
-Pensa prima di agire (requisito non documentato → fermati e segnala) · YAGNI · modifiche chirurgiche · ogni lavoro tracciato da una voce di `## Roadmap` o da una Micro-Spec (`/micro-spec`).
+## 1. General rules
+Think before acting (undocumented requirement → stop and report) · YAGNI · surgical changes · goal-driven: state the intended outcome before editing · every piece of work traced by a `## Roadmap` item or a Micro-Spec (`/micro-spec`).
 
-## 2. Stile di output — caveman mode
-Risposte in chat **telegrafiche**: niente articoli, riempitivi, cautele, preamboli né narrazione dei passi; frammenti OK; termini tecnici esatti.
-- **Esenti:** contenuto dei file scritti (spec, roadmap, doc, codice, commenti) e l'intervista di `/gather-requirements`.
-- Formati di output fissi restano verbatim. Mai perdere significato: path, ID, comandi, errori, numeri, negazioni, condizioni esatti.
+## 2. Output style — caveman mode
+Chat answers **telegraphic**: no articles, filler, hedging, preambles or step narration; fragments OK; exact technical terms.
+- **Exempt:** content of written files (specs, roadmap, docs, code, comments) and the `/gather-requirements` interview.
+- Fixed output formats stay verbatim. Never lose meaning: paths, IDs, commands, errors, numbers, negations, conditions exact.
 
-## 3. Pipeline SDD
-`/gather-requirements` → `docs/input/*.md` → `/spec-brainstorm <file>` → `docs/specs/*.spec.md` → `/init-new-project <root>` → `constitution.md` → `/SDD-implement <spec|N|-all>` ⇄ `/micro-spec <descrizione>`. Knowledge pipeline: `/generate-llm-wiki`, `/publish-llm-wiki <name>` (prerequisito `graphify`).
-- **Conductor** — `/SDD-implement` gira come primary agent e orchestra; delega via Task solo i checkpoint specialistici (un subagent non genera subagent).
-- **Discovery per ruolo** — gli asset sotto `.opencode/` si legano dal frontmatter, mai per filename; aggiungere un asset non richiede di editare un comando. Asset aggiunto/rinominato → aggiorna il Registry.
-- **`## Roadmap` = unica fonte di stato** — ordine e `- [ ]`/`- [x]`; si spunta solo a ciclo Plan → Produce → Validate → Publish completo. Mai stato altrove, mai roadmap inventate.
-- **Una voce per contesto** — tra una voce e la successiva: `/compact` o nuova sessione; alla ripresa si rilegge la `## Roadmap`.
+## 3. SDD pipeline
+`/gather-requirements` → `docs/input/*.md` → `/spec-brainstorm <file>` → `docs/specs/*.spec.md` → `/init-new-project <root>` → `constitution.md` → `/SDD-implement <spec|N|-all>` ⇄ `/micro-spec <description>`. Knowledge pipeline: `/generate-llm-wiki`, `/publish-llm-wiki <name>` (prerequisite `graphify`).
+- **Conductor** — `/SDD-implement` runs as primary agent and orchestrates; delegates only specialist checkpoints via Task (a subagent never spawns subagents).
+- **Discovery by role** — assets under `.opencode/` bind through frontmatter, never filenames; adding an asset requires no command edit. Asset added/renamed → update the Registry.
+- **`## Roadmap` = single source of state** — order and `- [ ]`/`- [x]`; check only when Plan → Produce → Validate → Publish is complete. Never state it elsewhere, never invent roadmaps.
+- **One item per context** — between items: `/compact` or a new session; on resume re-read `## Roadmap`.
 
-## 4. `raw/` immutabile
-Mai modificare, rinominare, spostare o cancellare sotto `raw/`: solo aggiungere (nuova versione = nuovo file). Imposto da `opencode.json` `permission.edit`.
+## 4. `raw/` immutable
+Never modify, rename, move or delete anything under `raw/`: add only (new version = new file). Enforced by `opencode.json` `permissions` (`edit` deny `raw/**`).
 
-## 5. Lingua
-`README.md`, spec e `constitution.md` in **italiano**; commands, agents, skills in **inglese**; `/gather-requirements`, `/spec-brainstorm`, `/micro-spec` nella lingua dell'utente (default italiano). Altrimenti segui la lingua del file.
+## 5. Language
+Repository artifacts — README, `docs/**`, specs, constitution, commands, agents, skills, prompts — in **English**. Conversational output and `/gather-requirements`, `/spec-brainstorm`, `/micro-spec` in the user's language (Italian by default). Otherwise follow the language of the file you are editing.
 
-## 6. RTK e lifecycle
-- Il plugin `.opencode/plugins/rtk.ts` riscrive i comandi shell in `rtk …`; senza `rtk` nel PATH lascia passare il comando invariato. Misura: `rtk gain -p`.
-- `/init-new-project` può riscrivere questo file: deve restare un nucleo minimo. Dopo modifiche, riapri la sessione.
+## 6. RTK and lifecycle
+- Plugin `.opencode/plugins/rtk.ts` rewrites shell commands to `rtk …`; without `rtk` in PATH the command passes unchanged. Measure: `rtk gain -p`.
+- `/init-new-project` may rewrite this file: it must stay a minimal core. After edits, restart the session.
