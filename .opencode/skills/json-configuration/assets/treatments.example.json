@@ -1,0 +1,18 @@
+{
+  "categories": [
+    {
+      "id": "face",
+      "name": "Face"
+    }
+  ],
+  "treatments": [
+    {
+      "id": "basic-facial",
+      "categoryId": "face",
+      "name": "Basic Facial",
+      "durationMinutes": 60,
+      "priceEUR": 70,
+      "image": "/images/basic-facial.webp"
+    }
+  ]
+}

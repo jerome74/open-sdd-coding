@@ -32,17 +32,28 @@
     "servers": {
       "tavily": {
         "type": "local",
-        "command": ["npx", "-y", "tavily-mcp"],
+        "command": [
+          "npx",
+          "-y",
+          "tavily-mcp"
+        ],
         "disabled": true
       },
       "fetch": {
         "type": "local",
-        "command": ["uvx", "mcp-server-fetch"],
+        "command": [
+          "uvx",
+          "mcp-server-fetch"
+        ],
         "disabled": true
       },
       "docs": {
         "type": "local",
-        "command": ["npx", "-y", "@upstash/context7-mcp"],
+        "command": [
+          "npx",
+          "-y",
+          "@upstash/context7-mcp"
+        ],
         "disabled": true
       },
       "github": {
@@ -53,6 +64,30 @@
         "headers": {
           "Authorization": "Bearer {env:GITHUB_TOKEN}"
         }
+      },
+      "dittu": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@manishtamang/dittu@0.3.0",
+          "mcp"
+        ],
+        "enabled": true
+      },
+      "playwright": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@playwright/mcp@latest",
+          "--headless",
+          "--viewport-size",
+          "1440x900",
+          "--caps",
+          "vision"
+        ],
+        "enabled": true
       }
     }
   },
